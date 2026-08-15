@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertOctagon, ChevronRight, CheckCircle, Users } from 'lucide-react';
-import { emergencyResponse, downstreamCustomers, systemArchitecture } from '../data/demoData';
+import { emergencyResponse, downstreamCustomers } from '../data/demoData';
 import './Impact.css';
 
 const Impact = () => {
@@ -164,42 +164,6 @@ const Impact = () => {
         </div>
       </motion.div>
 
-      {/* System Overview */}
-      <motion.div
-        className="system-overview"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-      >
-        <h3 className="subsection-title">How Horizon Works</h3>
-        <p className="subsection-description">
-          End-to-end continuity intelligence architecture
-        </p>
-
-        <div className="architecture-flow">
-          {systemArchitecture.map((step, index) => (
-            <div key={step.id} className="architecture-step">
-              <motion.div
-                className="step-card"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-              >
-                <div className="step-number">{String(step.id).padStart(2, '0')}</div>
-                <div className="step-content">
-                  <h4 className="step-title">{step.label}</h4>
-                  <p className="step-description">{step.description}</p>
-                </div>
-              </motion.div>
-              {index < systemArchitecture.length - 1 && (
-                <div className="step-connector">
-                  <ChevronRight size={20} />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </motion.div>
     </div>
   );
 };
