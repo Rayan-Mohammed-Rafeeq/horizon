@@ -26,6 +26,12 @@
   overflow-x: hidden;
 }
 
+/* Docs is a standalone view — fills the viewport, no scroll bleed from dashboard */
+.content-area.docs-standalone {
+  overflow-y: auto;
+  height: calc(100vh - 56px); /* subtract topbar height */
+}
+
 /* Ensure smooth scrolling */
 html {
   scroll-behavior: smooth;

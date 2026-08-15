@@ -1,4 +1,4 @@
-import { Home, Network, AlertTriangle, Activity, Shield, TrendingDown, X, ChevronsLeft, ChevronsRight, Zap } from 'lucide-react';
+import { Home, Network, AlertTriangle, Activity, Shield, TrendingDown, X, ChevronsLeft, ChevronsRight, Zap, BookOpen } from 'lucide-react';
 import './Sidebar.css';
 
 const navigationItems = [
@@ -9,6 +9,8 @@ const navigationItems = [
   { id: 'strategy',        label: 'Strategy',        icon: Shield,        shortcut: '05' },
   { id: 'impact',          label: 'Impact',          icon: TrendingDown,  shortcut: '06' },
 ];
+
+const docsItem = { id: 'docs', label: 'Docs', icon: BookOpen, shortcut: '07' };
 
 const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile, isCollapsed, onToggleCollapse }) => {
   const handleNavClick = (sectionId) => {
@@ -104,16 +106,13 @@ const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile, isColla
                   onClick={() => handleNavClick(item.id)}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  {/* Active glow bg */}
                   {isActive && <div className="nav-item-glow" />}
-
                   <div className={`nav-icon-wrap ${isActive ? 'active' : ''}`}>
                     <Icon size={15} strokeWidth={isActive ? 2.5 : 2} />
                     {item.alert && !isActive && (
                       <span className="nav-alert-dot" />
                     )}
                   </div>
-
                   {!isCollapsed && (
                     <>
                       <span className="nav-label">{item.label}</span>
@@ -123,6 +122,34 @@ const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile, isColla
                 </button>
               );
             })}
+
+            {/* ── Docs divider + item ── */}
+            <div className="nav-divider">
+              {!isCollapsed && <span className="nav-divider-label">RESOURCES</span>}
+            </div>
+
+            {(() => {
+              const Icon = docsItem.icon;
+              const isActive = activeSection === docsItem.id;
+              return (
+                <button
+                  className={`nav-item docs-item ${isActive ? 'active' : ''}`}
+                  onClick={() => handleNavClick(docsItem.id)}
+                  title={isCollapsed ? docsItem.label : undefined}
+                >
+                  {isActive && <div className="nav-item-glow" />}
+                  <div className={`nav-icon-wrap ${isActive ? 'active' : ''}`}>
+                    <Icon size={15} strokeWidth={isActive ? 2.5 : 2} />
+                  </div>
+                  {!isCollapsed && (
+                    <>
+                      <span className="nav-label">{docsItem.label}</span>
+                      <span className="nav-shortcut">{docsItem.shortcut}</span>
+                    </>
+                  )}
+                </button>
+              );
+            })()}
           </div>
         </nav>
 

@@ -156,30 +156,30 @@
 
 .logo-ring {
   position: relative;
-  width: 52px;
-  height: 52px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .logo-ring.small {
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
 }
 
 .logo-image {
-  width: 38px;
-  height: 38px;
+  width: 62px;
+  height: 62px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(124, 92, 255, 0.5));
+  filter: drop-shadow(0 0 14px rgba(124, 92, 255, 0.6));
   position: relative;
   z-index: 1;
 }
 
 .logo-image-small {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
   filter: drop-shadow(0 0 8px rgba(124, 92, 255, 0.4));
   position: relative;
@@ -443,6 +443,47 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
+}
+
+/* ── Nav divider (before Docs) ───────────── */
+.nav-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 10px 10px 4px;
+  margin-top: 4px;
+}
+
+.nav-divider::before {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.nav-divider-label {
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.18);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Docs item — subtle teal accent */
+.nav-item.docs-item.active {
+  border-color: rgba(6,182,212,0.3);
+  background: rgba(6,182,212,0.08);
+}
+
+.nav-item.docs-item.active::before {
+  background: linear-gradient(180deg, #06B6D4, #8b5cf6);
+  box-shadow: 0 0 8px rgba(6,182,212,0.6);
+}
+
+.nav-item.docs-item.active .nav-icon-wrap {
+  background: rgba(6,182,212,0.18);
+  box-shadow: 0 0 12px rgba(6,182,212,0.3);
 }
 
 /* ── Footer ──────────────────────────────── */
