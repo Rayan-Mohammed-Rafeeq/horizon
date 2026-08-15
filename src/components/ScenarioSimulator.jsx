@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingDown, AlertTriangle, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { TrendingDown, AlertTriangle, CheckCircle, ChevronDown, ChevronUp, AlertOctagon, TrendingUp, BarChart3, Shield, ClipboardCheck } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import BarrelInventory from './BarrelInventory';
 import { scenarios, getInventoryTimeline, recommendations, whyRecommendation, recommendationConfidence } from '../data/demoData';
@@ -8,7 +8,9 @@ import './ScenarioSimulator.css';
 
 const ScenarioSimulator = ({ onNavigate }) => {
   const [selectedDuration, setSelectedDuration] = useState(90);
-  const [showWhyRecommendation, setShowWhyRecommendation] = useState(false);
+  const [disruptionType, setDisruptionType] = useState('Strait of Hormuz Closure');
+  const [footprintIntensity, setFootprintIntensity] = useState('High');
+  const [recoveryAssumption, setRecoveryAssumption] = useState('Slow');
   
   const scenario = scenarios[selectedDuration];
   const recommendation = recommendations[selectedDuration] || recommendations[90];
@@ -28,15 +30,21 @@ const ScenarioSimulator = ({ onNavigate }) => {
     <div className="scenario-simulator-section" id="scenarios">
       {/* Header */}
       <motion.div
-        className="section-header"
+        className="scenario-header"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="section-title">What If?</h2>
-        <p className="section-subtitle">
-          Stress-test the business before reality does.
-        </p>
+        <div className="header-left">
+          <h2 className="scenario-number">SCENARIO SIMULATOR</h2>
+          <p className="scenario-subtitle">
+            Stress-test the business under multiple what-if scenarios.
+          </p>
+        </div>
+        <div className="live-feed-badge">
+          <span className="live-dot"></span>
+          LIVE FEED
+        </div>
       </motion.div>
 
       {/* Duration Selector */}
@@ -66,256 +74,455 @@ const ScenarioSimulator = ({ onNavigate }) => {
         </button>
       </motion.div>
 
-      {/* Scenario Summary */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={selectedDuration}
-          className="scenario-summary"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="summary-grid">
-            <div className="summary-card">
-              <div className="summary-label">Inventory Runway</div>
-              <div className="summary-value">{scenario.inventoryRunway} days</div>
-            </div>
-            
-            <div className="summary-card">
-              <div className="summary-label">Projected Supply Gap</div>
-              <div className={`summary-value ${scenario.supplyGap > 0 ? 'critical' : 'success'}`}>
-                {scenario.supplyGap > 0 ? `${scenario.supplyGap} days` : '0 days'}
-              </div>
-            </div>
-            
-            <div className="summary-card">
-              <div className="summary-label">Production Impact</div>
-              <div className="summary-value critical">{scenario.productionImpact}%</div>
-            </div>
-            
-            <div className="summary-card">
-              <div className="summary-label">Risk Level</div>
-              <div className={`summary-value ${scenario.risk === 'CRITICAL' ? 'critical' : 'warning'}`}>
-                {scenario.risk}
-              </div>
-            </div>
-          </div>
-          
-          <div className="scenario-description">
-            <AlertTriangle size={18} />
-            <p>{scenario.description}</p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Inventory Visualization */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`barrels-${selectedDuration}`}
-          className="inventory-visualization"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.4 }}
-        >
-          <h3 className="viz-title">Inventory Timeline</h3>
-          <BarrelInventory 
-            count={getBarrelCount()} 
-            total={5}
-            label="Current Inventory Status"
-          />
-          
-          {scenario.supplyGap > 0 && (
-            <div className="critical-threshold">
-              <AlertTriangle size={16} />
-              <span>CRITICAL THRESHOLD REACHED ON DAY {scenario.inventoryRunway}</span>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Business Impact Chart */}
-      <motion.div
-        className="impact-chart-container"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-      >
-        <h3 className="chart-title">Inventory Depletion Over Time</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={timelineData}>
-            <defs>
-              <linearGradient id="inventoryGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis 
-              dataKey="day" 
-              stroke="rgba(255,255,255,0.5)"
-              label={{ value: 'Days', position: 'insideBottom', offset: -5, fill: 'rgba(255,255,255,0.7)' }}
-            />
-            <YAxis 
-              stroke="rgba(255,255,255,0.5)"
-              label={{ value: 'Inventory %', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.7)' }}
-            />
-            <Tooltip 
-              contentStyle={{ 
-                background: '#1a1b23', 
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: '#fff'
-              }}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="inventory" 
-              stroke="#f59e0b" 
-              strokeWidth={2}
-              fill="url(#inventoryGradient)" 
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </motion.div>
-
-      {/* Projected Business Impact */}
-      <motion.div
-        className="business-impact"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        <h3 className="impact-title">Projected Business Impact</h3>
-        <div className="impact-metrics">
-          <div className="impact-metric">
-            <div className="impact-label">Cost Impact</div>
-            <div className="impact-value warning">+{scenario.costImpact}%</div>
-          </div>
-          <div className="impact-metric">
-            <div className="impact-label">Production Impact</div>
-            <div className="impact-value critical">{scenario.productionImpact}%</div>
-          </div>
-          <div className="impact-metric">
-            <div className="impact-label">Customer Commitments at Risk</div>
-            <div className="impact-value critical">{scenario.customerRisk}</div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Recommendation Panel */}
-      {selectedDuration >= 90 && (
-        <motion.div
-          className="recommendation-panel"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <div className="recommendation-header">
-            <h3 className="recommendation-title">Horizon Recommendation</h3>
-            <span className="confidence-badge">
-              Confidence: {recommendationConfidence.value}%
-            </span>
-          </div>
-          
-          <p className="recommendation-text">{recommendation.title}</p>
-          
-          <div className="recommendation-actions">
-            {recommendation.actions.map((action) => (
-              <div key={action.id} className="action-card">
-                <div className="action-number">{String(action.id).padStart(2, '0')}</div>
-                <div className="action-content">
-                  <div className="action-title">{action.title}</div>
-                  <div className="action-description">{action.description}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="recommendation-impact">
-            <h4 className="impact-subtitle">Projected Impact of Recommendation</h4>
-            <div className="impact-comparison">
-              <div className="comparison-item">
-                <div className="comparison-label">Supply Gap</div>
-                <div className="comparison-values">
-                  <span className="before critical">{recommendation.impact.supplyGapBefore} days</span>
-                  <span className="arrow">→</span>
-                  <span className="after success">{recommendation.impact.supplyGapAfter} days</span>
-                </div>
-              </div>
-              
-              <div className="comparison-item">
-                <div className="comparison-label">Production Continuity</div>
-                <div className="comparison-values">
-                  <span className="before warning">{recommendation.impact.continuityBefore}%</span>
-                  <span className="arrow">→</span>
-                  <span className="after success">{recommendation.impact.continuityAfter}%</span>
-                </div>
-              </div>
-              
-              <div className="comparison-item">
-                <div className="comparison-label">Risk Level</div>
-                <div className="comparison-values">
-                  <span className="before critical">{recommendation.impact.riskBefore}</span>
-                  <span className="arrow">→</span>
-                  <span className="after warning">{recommendation.impact.riskAfter}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <button 
-            className="btn btn-primary btn-full"
-            onClick={() => onNavigate('strategy')}
-          >
-            VIEW STRATEGY
-          </button>
-
-          {/* Why Recommendation Expandable */}
-          <div className="why-recommendation">
-            <button 
-              className="why-btn"
-              onClick={() => setShowWhyRecommendation(!showWhyRecommendation)}
+      {/* Main Content Grid */}
+      <div className="scenario-content-grid">
+        {/* Left Column */}
+        <div className="scenario-left-column">
+          {/* Energy Disruption Runway */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`runway-${selectedDuration}`}
+              className="energy-runway-panel"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
             >
-              <span>Why this recommendation?</span>
-              {showWhyRecommendation ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </button>
-            
-            <AnimatePresence>
-              {showWhyRecommendation && (
-                <motion.div
-                  className="why-content"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="reasoning-items">
-                    {whyRecommendation.map((item) => (
-                      <div key={item.id} className="reasoning-item">
-                        <div className="reasoning-number">{String(item.id).padStart(2, '0')}</div>
-                        <div className="reasoning-content">
-                          <div className="reasoning-title">{item.title}</div>
-                          <div className="reasoning-value">{item.value}</div>
-                        </div>
-                      </div>
-                    ))}
+              <h3 className="panel-title">ENERGY DISRUPTION RUNWAY</h3>
+              
+              <div className="runway-timeline">
+                <div className="timeline-labels">
+                  <span className="timeline-label">DAY 1</span>
+                  <span className="timeline-label">DAY 10</span>
+                  <span className="timeline-label critical">DAY 17</span>
+                  <span className="timeline-label">DAY 30</span>
+                  <span className="timeline-label">DAY 60</span>
+                  <span className="timeline-label">DAY 90</span>
+                </div>
+                
+                <div className="barrel-flow">
+                  <div className="barrel-group">
+                    <BarrelInventory count={2} total={2} compact={true} />
                   </div>
-                  
-                  <div className="uncertainty-note">
-                    <div className="uncertainty-label">Biggest Uncertainty</div>
-                    <div className="uncertainty-value">{recommendationConfidence.uncertainty}</div>
-                    <p className="uncertainty-disclaimer">
-                      This is a prototype explanation. Do not claim the AI has perfect knowledge.
-                    </p>
+                  <div className="flow-arrow">→</div>
+                  <div className="barrel-group">
+                    <BarrelInventory count={2} total={2} compact={true} />
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <div className="flow-arrow dashed">- - →</div>
+                  <div className="barrel-group critical-point">
+                    <div className="critical-barrels">
+                      <BarrelInventory count={2} total={2} compact={true} />
+                    </div>
+                    <div className="critical-marker">
+                      <AlertTriangle size={16} />
+                      <span>CRITICAL<br/>TRIGGERED</span>
+                    </div>
+                  </div>
+                  <div className="flow-arrow">→</div>
+                  <div className="barrel-group">
+                    <BarrelInventory count={2} total={2} compact={true} />
+                  </div>
+                  <div className="flow-arrow dashed">- - →</div>
+                  <div className="barrel-group">
+                    <BarrelInventory count={2} total={2} compact={true} />
+                  </div>
+                  <div className="flow-arrow long">- - - - - →</div>
+                  <div className="barrel-group">
+                    <BarrelInventory count={1} total={1} compact={true} />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Inventory Over Time Chart */}
+          <motion.div
+            className="inventory-chart-panel"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <h3 className="panel-title">INVENTORY OVER TIME (Days)</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={timelineData}>
+                <defs>
+                  <linearGradient id="inventoryGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="criticalGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#DC2626" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#DC2626" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis 
+                  dataKey="day" 
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }}
+                  axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                  tickLine={false}
+                />
+                <YAxis 
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }}
+                  axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                  tickLine={false}
+                  domain={[0, 30]}
+                  ticks={[0, 5, 10, 15, 20, 25, 30]}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    background: 'rgba(15, 15, 25, 0.95)', 
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    backdropFilter: 'blur(10px)'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="critical" 
+                  stroke="#DC2626" 
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  dot={false}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="inventory" 
+                  stroke="#8B5CF6" 
+                  strokeWidth={3}
+                  fill="url(#inventoryGradient)" 
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="criticalArea" 
+                  stroke="none" 
+                  fill="url(#criticalGradient)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+            <div className="chart-legend">
+              <div className="legend-item">
+                <div className="legend-line purple"></div>
+                <span>Available Inventory</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-line red dashed"></div>
+                <span>Critical Threshold</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Horizon Recommendation */}
+          <motion.div
+            className="horizon-recommendation-panel"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="recommendation-icon">
+              <BarChart3 size={48} />
+            </div>
+            <div className="recommendation-content">
+              <h3 className="recommendation-header">HORIZON RECOMMENDATION</h3>
+              <p className="recommendation-desc">
+                Proactive actions to build resilience & business continuity.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Recommendation Actions */}
+          <div className="recommendation-actions-grid">
+            <motion.div
+              className="action-box"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+            >
+              <div className="action-number-box">01</div>
+              <div className="action-text">
+                <div className="action-title-small">Secure alternative</div>
+                <div className="action-title-small">supply</div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="action-box"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+            >
+              <div className="action-number-box">02</div>
+              <div className="action-text">
+                <div className="action-title-small">Increase inventory</div>
+                <div className="action-title-small">buffer</div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="action-box"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+            >
+              <div className="action-number-box">03</div>
+              <div className="action-text">
+                <div className="action-title-small">Reduce non-critical</div>
+                <div className="action-title-small">consumption</div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="action-box"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.7 }}
+            >
+              <div className="action-number-box">04</div>
+              <div className="action-text">
+                <div className="action-title-small">Activate contingency</div>
+                <div className="action-title-small">plan B</div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
-      )}
+
+          {/* Quote */}
+          <motion.div
+            className="scenario-quote"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            <div className="quote-icon">❝</div>
+            <div className="quote-text">
+              Simulate. Prepare. Act early. <span className="highlight-purple">Stay ahead.</span>
+            </div>
+          </motion.div>
+
+          {/* Process Flow */}
+          <motion.div
+            className="process-flow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.9 }}
+          >
+            <div className="process-step">
+              <AlertTriangle size={20} />
+              <span className="step-label">Disruption<br/>Event</span>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <BarChart3 size={20} />
+              <span className="step-label">Inventory<br/>Depletion</span>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <TrendingDown size={20} />
+              <span className="step-label">Supply Gap<br/>Emerges</span>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <AlertOctagon size={20} />
+              <span className="step-label">Production<br/>Impact</span>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <Shield size={20} />
+              <span className="step-label">Business<br/>Risk</span>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step">
+              <ClipboardCheck size={20} />
+              <span className="step-label">Strategic<br/>Response</span>
+            </div>
+            <div className="process-arrow">→</div>
+            <div className="process-step success">
+              <CheckCircle size={20} />
+              <span className="step-label">Resilient<br/>Outcome</span>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right Column */}
+        <div className="scenario-right-column">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedDuration}
+              className="scenario-details-panel"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              {/* Scenario Title with Date */}
+              <div className="scenario-panel-header">
+                <div className="date-time">
+                  <div className="time-display">10:24 AM IST</div>
+                  <div className="date-display">May 14, 2025</div>
+                </div>
+                <h3 className="scenario-title">{selectedDuration} DAY SCENARIO</h3>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="scenario-metrics">
+                <div className="metric-row">
+                  <span className="metric-label-sm">FOOTPRINT IMPACT</span>
+                  <span className="metric-value-sm">{scenario.inventoryRunway} days</span>
+                </div>
+                <div className="metric-row">
+                  <span className="metric-label-sm">PROJECTED SUPPLY GAP</span>
+                  <span className="metric-value-sm">{scenario.supplyGap} days</span>
+                </div>
+                <div className="metric-row">
+                  <span className="metric-label-sm">PRODUCTION IMPACT</span>
+                  <span className="metric-value-sm critical">{scenario.productionImpact}%</span>
+                </div>
+                <div className="metric-row">
+                  <span className="metric-label-sm">OUTAGE COMMITMENTS</span>
+                  <span className="metric-value-sm">{scenario.customerRisk} at risk</span>
+                </div>
+                <div className="metric-row">
+                  <span className="metric-label-sm">RISK LEVEL</span>
+                  <span className={`metric-value-sm risk-badge ${scenario.risk === 'CRITICAL' ? 'critical' : 'warning'}`}>
+                    {scenario.risk}
+                  </span>
+                </div>
+              </div>
+
+              {/* Scenario Controls */}
+              <div className="scenario-controls">
+                <h4 className="controls-title">SCENARIO CONTROLS</h4>
+                
+                <div className="control-group">
+                  <label className="control-label">Select Disruption Type</label>
+                  <div className="custom-select">
+                    <select 
+                      value={disruptionType} 
+                      onChange={(e) => setDisruptionType(e.target.value)}
+                      className="select-input"
+                    >
+                      <option>Strait of Hormuz Closure</option>
+                      <option>Pipeline Disruption</option>
+                      <option>Port Strike</option>
+                      <option>Weather Event</option>
+                    </select>
+                    <ChevronDown size={16} className="select-arrow" />
+                  </div>
+                </div>
+
+                <div className="control-group">
+                  <label className="control-label">Footprint Intensity</label>
+                  <div className="custom-select">
+                    <select 
+                      value={footprintIntensity} 
+                      onChange={(e) => setFootprintIntensity(e.target.value)}
+                      className="select-input"
+                    >
+                      <option>High</option>
+                      <option>Medium</option>
+                      <option>Low</option>
+                    </select>
+                    <ChevronDown size={16} className="select-arrow" />
+                  </div>
+                </div>
+
+                <div className="control-group">
+                  <label className="control-label">Recovery Assumption</label>
+                  <div className="custom-select">
+                    <select 
+                      value={recoveryAssumption} 
+                      onChange={(e) => setRecoveryAssumption(e.target.value)}
+                      className="select-input"
+                    >
+                      <option>Slow</option>
+                      <option>Moderate</option>
+                      <option>Fast</option>
+                    </select>
+                    <ChevronDown size={16} className="select-arrow" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Run Scenario Button */}
+              <button className="run-scenario-btn">
+                RUN SCENARIO ▶
+              </button>
+
+              {/* Sensitivity Analysis */}
+              <div className="sensitivity-analysis">
+                <h4 className="sensitivity-title">SENSITIVITY ANALYSIS</h4>
+                <p className="sensitivity-subtitle">
+                  Adjust a factor to see potential outcome changes
+                </p>
+
+                <div className="sensitivity-sliders">
+                  <div className="slider-group">
+                    <div className="slider-header">
+                      <div className="slider-icon">🌍</div>
+                      <span className="slider-label">Global Demand Spike</span>
+                      <span className="slider-value">+20%</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="-50" 
+                      max="50" 
+                      defaultValue="20" 
+                      className="slider red"
+                    />
+                  </div>
+
+                  <div className="slider-group">
+                    <div className="slider-header">
+                      <div className="slider-icon">🚢</div>
+                      <span className="slider-label">Shipping Delay</span>
+                      <span className="slider-value">+15 days</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="30" 
+                      defaultValue="15" 
+                      className="slider orange"
+                    />
+                  </div>
+
+                  <div className="slider-group">
+                    <div className="slider-header">
+                      <div className="slider-icon">🤝</div>
+                      <span className="slider-label">Supplier Reliability</span>
+                      <span className="slider-value">-10%</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="-50" 
+                      max="50" 
+                      defaultValue="-10" 
+                      className="slider green"
+                    />
+                  </div>
+
+                  <div className="slider-group">
+                    <div className="slider-header">
+                      <div className="slider-icon">💰</div>
+                      <span className="slider-label">Price Volatility</span>
+                      <span className="slider-value">+25%</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="-50" 
+                      max="100" 
+                      defaultValue="25" 
+                      className="slider purple"
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 };

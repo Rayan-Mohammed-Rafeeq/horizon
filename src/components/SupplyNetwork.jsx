@@ -1,465 +1,424 @@
-import { motion } from 'framer-motion';
+import { motion, useAnimationFrame } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 import './SupplyNetwork.css';
 
+/* ─── Animated arrow-dot that travels along an SVG path ─── */
+const FlowDot = ({ pathId, color, duration = 3, delay = 0 }) => {
+  const groupRef = useRef(null);
+  const startTime = useRef(null);
+
+  useAnimationFrame((time) => {
+    if (!groupRef.current) return;
+    const path = document.getElementById(pathId);
+    if (!path) return;
+    if (!startTime.current) startTime.current = time;
+    const elapsed = (time - startTime.current + delay * 1000) % (duration * 1000);
+    const progress = elapsed / (duration * 1000);
+    const totalLength = path.getTotalLength();
+
+    // current position
+    const p0 = path.getPointAtLength(Math.max(0, progress * totalLength - 0.5));
+    const p1 = path.getPointAtLength(progress * totalLength);
+
+    const angle = Math.atan2(p1.y - p0.y, p1.x - p0.x) * (180 / Math.PI);
+    groupRef.current.setAttribute('transform', `translate(${p1.x},${p1.y}) rotate(${angle})`);
+  });
+
+  return (
+    <g ref={groupRef}>
+      {/* small filled circle */}
+      <circle r="1.8" fill={color} style={{ filter: `drop-shadow(0 0 3px ${color})` }} />
+    </g>
+  );
+};
+
+/* ─── Pulsing ring for live nodes ─── */
+const PulseRing = ({ color }) => (
+  <span className="pulse-ring" style={{ '--ring-color': color }} />
+);
+
 const SupplyNetwork = () => {
-  const getCurrentDateTime = () => {
+  const [hoveredNode, setHoveredNode] = useState(null);
+  const [tick, setTick] = useState(0);
+
+  /* live clock */
+  const [clock, setClock] = useState(() => {
     const now = new Date();
-    const time = now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false 
-    });
-    const date = now.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-    return { time: `${time} IST`, date };
-  };
+    return {
+      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' IST',
+      date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    };
+  });
 
-  const { time, date } = getCurrentDateTime();
+  useEffect(() => {
+    const id = setInterval(() => {
+      const now = new Date();
+      setClock({
+        time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' IST',
+        date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      });
+      setTick(t => t + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
 
-  // Recent activities
+  /* vigilance sparkline */
+  const vigilancePoints = useRef(Array.from({ length: 40 }, (_, i) => ({
+    x: i,
+    y: 20 + Math.sin(i * 0.4) * 8 + Math.random() * 4,
+  })));
+  const vPath = vigilancePoints.current.map((p, i) =>
+    `${i === 0 ? 'M' : 'L'} ${p.x * 3} ${40 - p.y}`
+  ).join(' ');
+
   const recentActivities = [
-    { id: 1, text: 'Shipping delay on Route A', time: '2h ago', status: 'critical' },
-    { id: 2, text: 'Freight rates on Gulf route increased', time: '6h ago', status: 'warning' },
-    { id: 3, text: 'Shipping activity high on alternative route', time: '9h ago', status: 'success' },
-    { id: 4, text: 'Contingency Plan B activated', time: '12h ago', status: 'info' }
+    { id: 1, text: 'Shipping delay on Route A', time: '2h ago', status: 'critical', emoji: '🚨' },
+    { id: 2, text: 'Freight rates on Gulf route increased', time: '6h ago', status: 'warning', emoji: '⚠️' },
+    { id: 3, text: 'Shipping activity high on alt route', time: '9h ago', status: 'success', emoji: '✅' },
+    { id: 4, text: 'Contingency Plan B activated', time: '12h ago', status: 'info', emoji: '🔵' },
   ];
 
-  // Generate simple line chart data for vigilance
-  const vigilanceData = Array.from({ length: 30 }, (_, i) => ({
-    x: i,
-    y: 20 + Math.sin(i * 0.3) * 10 + Math.random() * 5
-  }));
-
-  const vigilancePath = vigilanceData.map((point, i) => 
-    `${i === 0 ? 'M' : 'L'} ${point.x * 3} ${40 - point.y}`
-  ).join(' ');
+  /*
+   * Flow paths — coords in the 900×520 SVG viewBox.
+   * Canvas is now 520px tall. Node positions:
+   *   Gulf Supplier    top:5%→26px,   h≈95  → midY=73,  right edge=194
+   *   Port Terminal    top:5%→26px,   h≈80  → midY=66,  left=279 right=359
+   *   Hormuz           top:3%→16px,   h≈100 → midY=66,  left=414 right=529
+   *   Sea Route        top:8%→42px,   h≈68  → midY=76,  left=630
+   *   Russian Supplier top:38%→198px, h≈95  → midY=245, right=194
+   *   Alt Route 1      top:41%→213px, h≈68  → midY=247, left=351 right=439
+   *   Brazilian Sup.   top:68%→354px, h≈95  → midY=401, right=194
+   *   Alt Route 2      top:68%→354px, h≈68  → midY=388, left=351 right=439
+   *   Bharat Hub       top:33%→172px, h≈110 → midY=227, left=639
+   *   Refinery 01      top:72%→374px, h≈65  → midY=407, left=567
+   *   Refinery 02      top:72%→374px, h≈65  → midY=407, left=720
+   */
+  const flowPaths = [
+    { id: 'fp-gulf-port',   d: 'M 194 73  L 279 66',                        color: '#ef4444', dur: 2.2, delay: 0   },
+    { id: 'fp-port-hormuz', d: 'M 359 66  L 414 66',                        color: '#ef4444', dur: 2.5, delay: 0.3 },
+    { id: 'fp-hormuz-sea',  d: 'M 529 66  L 630 76',                        color: '#ef4444', dur: 2.8, delay: 0.6 },
+    { id: 'fp-sea-hub',     d: 'M 666 110 Q 668 175 639 217',               color: '#6366f1', dur: 2.6, delay: 0.2 },
+    { id: 'fp-port-down',   d: 'M 319 106 Q 330 180 351 237',               color: '#6366f1', dur: 3.0, delay: 0.4 },
+    { id: 'fp-hormuz-down', d: 'M 471 116 Q 460 175 439 237',               color: '#6366f1', dur: 3.0, delay: 0.7 },
+    { id: 'fp-russia-alt',  d: 'M 194 245 L 351 247',                       color: '#f59e0b', dur: 2.3, delay: 0.1 },
+    { id: 'fp-alt1-hub',    d: 'M 439 247 L 639 227',                       color: '#6366f1', dur: 2.4, delay: 0.5 },
+    { id: 'fp-brazil-alt',  d: 'M 194 401 L 351 388',                       color: '#10b981', dur: 2.6, delay: 0   },
+    { id: 'fp-alt2-hub',    d: 'M 439 388 Q 560 370 639 282',               color: '#6366f1', dur: 3.0, delay: 0.6 },
+    { id: 'fp-hub-ref1',    d: 'M 680 282 Q 650 360 602 374',               color: '#8b5cf6', dur: 2.0, delay: 0   },
+    { id: 'fp-hub-ref2',    d: 'M 746 282 Q 752 360 755 374',               color: '#8b5cf6', dur: 2.0, delay: 0.4 },
+  ];
 
   return (
     <div className="supply-network-section" id="supply-network">
-      {/* Section Header */}
-      <motion.div
-        className="sn-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+
+      {/* ════ HEADER ════ */}
+      <motion.div className="sn-header"
+        initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
         <div className="sn-header-left">
-          <div className="sn-section-number">02</div>
           <div className="sn-header-content">
-            <h2 className="sn-section-title">SUPPLY NETWORK</h2>
-            <p className="sn-section-subtitle">Understand how energy flows from global sources to your operations.</p>
+            <div className="sn-eyebrow">SECTION 02 • LIVE TRACKING</div>
+            <h2 className="sn-section-title">
+              <span className="grad-text">Supply</span> Network
+            </h2>
+            <p className="sn-section-subtitle">
+              How energy flows from global sources to your operations — in real time.
+            </p>
           </div>
         </div>
+
         <div className="sn-header-right">
-          <div className="sn-live-indicator">
-            <span className="sn-live-dot"></span>
+          <div className="sn-live-pill">
+            <PulseRing color="#10b981" />
             <span>LIVE FEED</span>
           </div>
-          <div className="sn-datetime">
-            <div className="sn-time">{time}</div>
-            <div className="sn-date">{date}</div>
+          <div className="sn-clock-block">
+            <div className="sn-time">{clock.time}</div>
+            <div className="sn-date">{clock.date}</div>
           </div>
-          <div className="sn-demo-badge">DEMO ENVIRONMENT • ILLUSTRATIVE DATA</div>
+          <div className="sn-demo-badge">DEMO ENV • ILLUSTRATIVE</div>
         </div>
       </motion.div>
 
-      {/* Risk Legend */}
-      <motion.div
-        className="sn-risk-legend"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        <div className="sn-legend-item">
-          <div className="sn-legend-dot high-risk"></div>
-          <span>HIGH RISK</span>
-        </div>
-        <div className="sn-legend-item">
-          <div className="sn-legend-dot medium-risk"></div>
-          <span>MEDIUM RISK</span>
-        </div>
-        <div className="sn-legend-item">
-          <div className="sn-legend-dot low-risk"></div>
-          <span>LOW RISK</span>
-        </div>
-        <div className="sn-legend-item">
-          <div className="sn-legend-arrow"></div>
-          <span>FLOW OF SUPPLY</span>
-        </div>
+      {/* ════ RISK LEGEND ════ */}
+      <motion.div className="sn-risk-legend"
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.1 }}>
+        {[
+          { label: 'HIGH RISK',   color: '#ef4444', type: 'dot' },
+          { label: 'MEDIUM RISK', color: '#f59e0b', type: 'dot' },
+          { label: 'LOW RISK',    color: '#10b981', type: 'dot' },
+          { label: 'FLOW OF SUPPLY', color: '#8b5cf6', type: 'arrow' },
+        ].map(({ label, color, type }) => (
+          <div className="sn-legend-item" key={label}>
+            {type === 'dot'
+              ? <span className="sn-legend-dot" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
+              : <span className="sn-legend-line" style={{ background: color }}>
+                  <span className="sn-legend-arrow-tip" style={{ borderLeftColor: color }} />
+                </span>
+            }
+            <span>{label}</span>
+          </div>
+        ))}
       </motion.div>
 
-      {/* Main Network Visualization Container */}
-      <motion.div
-        className="sn-main-grid"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        {/* Left Side: Network Diagram + Left Vigilance */}
+      {/* ════ MAIN GRID ════ */}
+      <motion.div className="sn-main-grid"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }}>
+
+        {/* ── NETWORK CANVAS ── */}
         <div className="sn-network-area">
           <div className="sn-network-canvas">
-            {/* Supplier Nodes - Left Side */}
-            <div className="sn-supplier-node high-risk" style={{ top: '10%', left: '2%' }}>
-              <div className="sn-node-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                  <path d="M2 17l10 5 10-5"/>
-                  <path d="M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <div className="sn-node-content">
-                <div className="sn-node-title">Gulf Supplier</div>
-                <div className="sn-node-subtitle">Raw Oil / Crude</div>
-                <div className="sn-node-percentage">41%</div>
-                <div className="sn-node-risk">HIGH RISK</div>
-              </div>
-            </div>
 
-            <div className="sn-supplier-node medium-risk" style={{ top: '40%', left: '2%' }}>
-              <div className="sn-node-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 6v6l4 2"/>
-                </svg>
-              </div>
-              <div className="sn-node-content">
-                <div className="sn-node-title">Russian Supplier</div>
-                <div className="sn-node-subtitle">Crude Oil</div>
-                <div className="sn-node-percentage">27%</div>
-                <div className="sn-node-risk">MEDIUM RISK</div>
-              </div>
-            </div>
+            {/* ── SUPPLIER NODES ── */}
+            {[
+              { risk: 'high',   title: 'Gulf Supplier',     sub: 'Raw Oil / Crude', pct: '41%', top: '5%',  left: '1%',  color: '#ef4444' },
+              { risk: 'medium', title: 'Russian Supplier',  sub: 'Crude Oil',       pct: '27%', top: '38%', left: '1%',  color: '#f59e0b' },
+              { risk: 'low',    title: 'Brazilian Supplier',sub: 'LPG / LNG',       pct: '32%', top: '68%', left: '1%',  color: '#10b981' },
+            ].map(({ risk, title, sub, pct, top, left, color }) => (
+              <motion.div
+                key={title}
+                className={`sn-supplier-node ${risk}-risk`}
+                style={{ top, left, '--node-color': color }}
+                onHoverStart={() => setHoveredNode(title)}
+                onHoverEnd={() => setHoveredNode(null)}
+                whileHover={{ scale: 1.04, y: -3 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              >
+                <div className="sn-node-glow" />
+                <div className="sn-node-header">
+                  <span className="sn-node-title">{title}</span>
+                  <span className={`sn-risk-pill ${risk}`}>{risk.toUpperCase()} RISK</span>
+                </div>
+                <div className="sn-node-sub">{sub}</div>
+                <div className="sn-node-pct" style={{ color }}>{pct}</div>
+              </motion.div>
+            ))}
 
-            <div className="sn-supplier-node low-risk" style={{ top: '70%', left: '2%' }}>
-              <div className="sn-node-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                </svg>
-              </div>
-              <div className="sn-node-content">
-                <div className="sn-node-title">Brazilian Supplier</div>
-                <div className="sn-node-subtitle">LPG / LNG</div>
-                <div className="sn-node-percentage">32%</div>
-                <div className="sn-node-risk">LOW RISK</div>
-              </div>
-            </div>
+            {/* ── PORT / EXPORT TERMINAL ── */}
+            <motion.div className="sn-transit-node" style={{ top: '5%', left: '31%' }}
+              whileHover={{ scale: 1.08 }} transition={{ type: 'spring', stiffness: 300 }}>
+              <div className="sn-transit-icon">🏭</div>
+              <div className="sn-transit-label">Port / Export<br />Terminal</div>
+            </motion.div>
 
-            {/* Port/Export Terminal */}
-            <div className="sn-transit-node" style={{ top: '10%', left: '32%' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="11" width="18" height="10" rx="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-              </svg>
-              <div className="sn-transit-label">Port / Export<br/>Terminal</div>
-            </div>
+            {/* ── STRAIT OF HORMUZ ── CHOKEPOINT */}
+            <motion.div className="sn-chokepoint-node" style={{ top: '3%', left: '46%' }}
+              whileHover={{ scale: 1.06 }}
+              animate={{ boxShadow: ['0 0 20px rgba(239,68,68,0.4)', '0 0 38px rgba(239,68,68,0.75)', '0 0 20px rgba(239,68,68,0.4)'] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
+              <div className="sn-chokepoint-badge">⚠ CRITICAL</div>
+              <div className="sn-chokepoint-icon">🔴</div>
+              <div className="sn-chokepoint-label">STRAIT OF<br />HORMUZ</div>
+            </motion.div>
 
-            {/* Strait of Hormuz - Critical Chokepoint */}
-            <div className="sn-chokepoint-node" style={{ top: '8%', left: '48%' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-              <div className="sn-chokepoint-label">STRAIT OF<br/>HORMUZ</div>
-            </div>
+            {/* ── SEA ROUTE ── */}
+            <motion.div className="sn-transit-node" style={{ top: '8%', left: '70%' }}
+              whileHover={{ scale: 1.08 }} transition={{ type: 'spring', stiffness: 300 }}>
+              <div className="sn-transit-icon">⛴</div>
+              <div className="sn-transit-label">Sea<br />Route</div>
+            </motion.div>
 
-            {/* Sea Route */}
-            <div className="sn-transit-node" style={{ top: '13%', left: '71%' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
-                <path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-3.5 7"/>
-              </svg>
-              <div className="sn-transit-label">Sea<br/>Route</div>
-            </div>
+            {/* ── ALT ROUTES ── */}
+            {[{ top: '41%', left: '39%' }, { top: '68%', left: '39%' }].map((pos, i) => (
+              <motion.div key={i} className="sn-alt-route-node" style={pos}
+                whileHover={{ scale: 1.06 }} transition={{ type: 'spring', stiffness: 280 }}>
+                <div className="sn-alt-icon">🔀</div>
+                <div className="sn-alt-label">Alt Maritime<br />Route</div>
+              </motion.div>
+            ))}
 
-            {/* Alternative Maritime Routes */}
-            <div className="sn-alt-route-node" style={{ top: '43%', left: '40%' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 16 16 12 12 8"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-              <div className="sn-alt-route-label">Alternative<br/>Maritime Route</div>
-            </div>
-
-            <div className="sn-alt-route-node" style={{ top: '73%', left: '40%' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 16 16 12 12 8"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-              <div className="sn-alt-route-label">Alternative<br/>Maritime Route</div>
-            </div>
-
-            {/* Bharat Downstream & Materials Hub */}
-            <div className="sn-hub-node" style={{ top: '38%', left: '72%' }}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="7" height="7"/>
-                <rect x="14" y="3" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/>
-              </svg>
-              <div className="sn-hub-label">
+            {/* ── BHARAT HUB ── */}
+            <motion.div className="sn-hub-node" style={{ top: '33%', left: '71%' }}
+              whileHover={{ scale: 1.05 }}
+              animate={{ boxShadow: ['0 0 25px rgba(99,102,241,0.4)', '0 0 45px rgba(99,102,241,0.7)', '0 0 25px rgba(99,102,241,0.4)'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+              <div className="sn-hub-inner">
+                <div className="sn-hub-icon">⬡</div>
                 <div className="sn-hub-title">BHARAT</div>
-                <div className="sn-hub-subtitle">DOWNSTREAM</div>
-                <div className="sn-hub-subtitle">&</div>
-                <div className="sn-hub-subtitle">MATERIALS HUB</div>
+                <div className="sn-hub-sub">DOWNSTREAM &<br />MATERIALS HUB</div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Refineries */}
-            <div className="sn-refinery-node" style={{ top: '75%', left: '65%' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M2 20h20"/>
-                <path d="M7 20V10l5-5 5 5v10"/>
-              </svg>
-              <div className="sn-refinery-label">Refinery 01</div>
-            </div>
+            {/* ── REFINERIES ── */}
+            {[
+              { label: 'Refinery 01', top: '72%', left: '63%' },
+              { label: 'Refinery 02', top: '72%', left: '80%' },
+            ].map(({ label, top, left }) => (
+              <motion.div key={label} className="sn-refinery-node" style={{ top, left }}
+                whileHover={{ scale: 1.07 }} transition={{ type: 'spring', stiffness: 280 }}>
+                <div className="sn-refinery-icon">🏗</div>
+                <div className="sn-refinery-label">{label}</div>
+              </motion.div>
+            ))}
 
-            <div className="sn-refinery-node" style={{ top: '75%', left: '82%' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M2 20h20"/>
-                <path d="M7 20V10l5-5 5 5v10"/>
-              </svg>
-              <div className="sn-refinery-label">Refinery 02</div>
-            </div>
-
-            {/* Flow Lines - SVG Overlay */}
-            <svg className="sn-flow-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            {/* ── SVG FLOW LINES + ANIMATED DOTS ── */}
+            <svg className="sn-flow-lines" viewBox="0 0 900 520" preserveAspectRatio="xMidYMid meet">
               <defs>
-                {/* Smaller, thinner arrow markers */}
-                <marker id="arrow-red" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <path d="M0,0 L0,6 L6,3 z" fill="#ef4444"/>
-                </marker>
-                <marker id="arrow-orange" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <path d="M0,0 L0,6 L6,3 z" fill="#f59e0b"/>
-                </marker>
-                <marker id="arrow-green" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <path d="M0,0 L0,6 L6,3 z" fill="#10b981"/>
-                </marker>
-                <marker id="arrow-blue" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                  <path d="M0,0 L0,6 L6,3 z" fill="#6366f1"/>
-                </marker>
+                {[
+                  { id: 'ar-red',    c: '#ef4444' },
+                  { id: 'ar-orange', c: '#f59e0b' },
+                  { id: 'ar-green',  c: '#10b981' },
+                  { id: 'ar-indigo', c: '#6366f1' },
+                  { id: 'ar-violet', c: '#8b5cf6' },
+                ].map(({ id, c }) => (
+                  <marker key={id} id={id} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                    <path d="M0,0 L0,7 L7,3.5 z" fill={c} />
+                  </marker>
+                ))}
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
               </defs>
-              
-              {/* Gulf to Port - Red dashed arrow */}
-              <path d="M 18 10 L 30 10" className="sn-flow-line high-risk" strokeDasharray="3,2" markerEnd="url(#arrow-red)"/>
-              
-              {/* Port to Hormuz - Red dashed arrow */}
-              <path d="M 37 10 L 47 9" className="sn-flow-line high-risk" strokeDasharray="3,2" markerEnd="url(#arrow-red)"/>
-              
-              {/* Port vertical connection down */}
-              <path d="M 33.5 13 L 33.5 30" className="sn-flow-line-connection" strokeDasharray="2,2" stroke="#6366f1"/>
-              
-              {/* Hormuz to Sea Route - Red dashed arrow */}
-              <path d="M 58 11 L 69 13" className="sn-flow-line high-risk" strokeDasharray="3,2" markerEnd="url(#arrow-red)"/>
-              
-              {/* Hormuz vertical connection down */}
-              <path d="M 53.5 16 L 53.5 32" className="sn-flow-line-connection" strokeDasharray="2,2" stroke="#6366f1"/>
-              
-              {/* Sea Route to Hub - Blue dashed arrow */}
-              <path d="M 75 17 L 75 36" className="sn-flow-line-connection" strokeDasharray="2,2" stroke="#6366f1" markerEnd="url(#arrow-blue)"/>
-              
-              {/* Russia to Alt Route - Orange solid arrow */}
-              <path d="M 18 40 L 38 40" className="sn-flow-line medium-risk" markerEnd="url(#arrow-orange)"/>
-              
-              {/* Alt Route (Russia) to Hormuz connection */}
-              <path d="M 45 37 L 52 33" className="sn-flow-line-connection" strokeDasharray="2,2" stroke="#6366f1"/>
-              
-              {/* Alt Route (Russia) to Hub - Blue dashed arrow */}
-              <path d="M 52 40 L 70 40" className="sn-flow-line-connection" strokeDasharray="2,2" stroke="#6366f1" markerEnd="url(#arrow-blue)"/>
-              
-              {/* Brazil to Alt Route - Green solid arrow */}
-              <path d="M 18 70 L 38 70" className="sn-flow-line low-risk" markerEnd="url(#arrow-green)"/>
-              
-              {/* Alt Route (Brazil) to Hub - Blue dashed curved arrow */}
-              <path d="M 52 70 L 60 65 Q 68 58 71 50" className="sn-flow-line-connection" strokeDasharray="2,2" stroke="#6366f1" markerEnd="url(#arrow-blue)" fill="none"/>
-              
-              {/* Hub to Refinery 01 - Blue arrow */}
-              <path d="M 73 56 L 68 77" className="sn-flow-line-connection" stroke="#6366f1" markerEnd="url(#arrow-blue)"/>
-              
-              {/* Hub to Refinery 02 - Blue arrow */}
-              <path d="M 83 56 L 85 77" className="sn-flow-line-connection" stroke="#6366f1" markerEnd="url(#arrow-blue)"/>
-            </svg>
-          </div>
 
-          {/* Always-on Vigilance Card - Left (REMOVED) */}
+              <path id="fp-gulf-port"   d="M 194 73  L 279 66"            stroke="#ef4444" strokeWidth="1.5" strokeDasharray="6,4" fill="none" markerEnd="url(#ar-red)"    filter="url(#glow)" opacity="0.85"/>
+              <path id="fp-port-hormuz" d="M 359 66  L 414 66"            stroke="#ef4444" strokeWidth="1.5" strokeDasharray="6,4" fill="none" markerEnd="url(#ar-red)"    filter="url(#glow)" opacity="0.85"/>
+              <path id="fp-hormuz-sea"  d="M 529 66  L 630 76"            stroke="#ef4444" strokeWidth="1.5" strokeDasharray="6,4" fill="none" markerEnd="url(#ar-red)"    filter="url(#glow)" opacity="0.85"/>
+              <path id="fp-sea-hub"     d="M 666 110 Q 668 175 639 217"   stroke="#6366f1" strokeWidth="1.5" strokeDasharray="6,4" fill="none" markerEnd="url(#ar-indigo)" filter="url(#glow)" opacity="0.75"/>
+              <path id="fp-port-down"   d="M 319 106 Q 330 180 351 237"   stroke="#6366f1" strokeWidth="1"   strokeDasharray="4,4" fill="none"                             opacity="0.5"/>
+              <path id="fp-hormuz-down" d="M 471 116 Q 460 175 439 237"   stroke="#6366f1" strokeWidth="1"   strokeDasharray="4,4" fill="none"                             opacity="0.5"/>
+              <path id="fp-russia-alt"  d="M 194 245 L 351 247"           stroke="#f59e0b" strokeWidth="1.8" fill="none"           markerEnd="url(#ar-orange)"              filter="url(#glow)" opacity="0.9"/>
+              <path id="fp-alt1-hub"    d="M 439 247 L 639 227"           stroke="#6366f1" strokeWidth="1.5" strokeDasharray="6,4" fill="none" markerEnd="url(#ar-indigo)" filter="url(#glow)" opacity="0.75"/>
+              <path id="fp-brazil-alt"  d="M 194 401 L 351 388"           stroke="#10b981" strokeWidth="1.8" fill="none"           markerEnd="url(#ar-green)"               filter="url(#glow)" opacity="0.9"/>
+              <path id="fp-alt2-hub"    d="M 439 388 Q 560 370 639 282"   stroke="#6366f1" strokeWidth="1.5" strokeDasharray="6,4" fill="none" markerEnd="url(#ar-indigo)" filter="url(#glow)" opacity="0.75"/>
+              <path id="fp-hub-ref1"    d="M 680 282 Q 650 360 602 374"   stroke="#8b5cf6" strokeWidth="1.5" fill="none"           markerEnd="url(#ar-violet)"              filter="url(#glow)" opacity="0.8"/>
+              <path id="fp-hub-ref2"    d="M 746 282 Q 752 360 755 374"   stroke="#8b5cf6" strokeWidth="1.5" fill="none"           markerEnd="url(#ar-violet)"              filter="url(#glow)" opacity="0.8"/>
+
+              {flowPaths.map(fp => (
+                <FlowDot key={fp.id} pathId={fp.id} color={fp.color} duration={fp.dur} delay={fp.delay} />
+              ))}
+            </svg>
+
+            {/* ── PROCESS LEGEND — fills the empty bottom strip ── */}
+            <div className="sn-canvas-legend">
+              {[
+                { icon: '📦', title: 'Source',      sub: 'Suppliers' },
+                { icon: '🏭', title: 'Export',      sub: 'Ports' },
+                { icon: '⛴',  title: 'Transit',     sub: 'Routes' },
+                { icon: '⬡',  title: 'Destination', sub: 'Hub' },
+                { icon: '🏗',  title: 'Processing',  sub: 'Refineries' },
+                { icon: '⚡',  title: 'End Use',     sub: 'Operations' },
+              ].map(({ icon, title, sub }, i, arr) => (
+                <div className="sn-canvas-proc-wrap" key={title}>
+                  <div className="sn-canvas-proc-step">
+                    <span className="sn-proc-icon">{icon}</span>
+                    <span className="sn-proc-title">{title}</span>
+                    <span className="sn-proc-sub">({sub})</span>
+                  </div>
+                  {i < arr.length - 1 && <span className="sn-proc-arrow">→</span>}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Right Side: Information Cards */}
+        {/* ── RIGHT PANEL ── */}
         <div className="sn-info-area">
-          {/* Supply Mix Card */}
-          <motion.div
-            className="sn-supply-mix-card"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <div className="sn-card-title">SUPPLY MIX (BY SOURCE)</div>
-            <div className="sn-donut-container">
-              <svg width="140" height="140" viewBox="0 0 140 140">
-                <circle cx="70" cy="70" r="50" fill="none" stroke="#ef4444" strokeWidth="20" 
-                  strokeDasharray="129 314" transform="rotate(-90 70 70)"/>
-                <circle cx="70" cy="70" r="50" fill="none" stroke="#f59e0b" strokeWidth="20" 
-                  strokeDasharray="85 314" strokeDashoffset="-129" transform="rotate(-90 70 70)"/>
-                <circle cx="70" cy="70" r="50" fill="none" stroke="#10b981" strokeWidth="20" 
-                  strokeDasharray="100 314" strokeDashoffset="-214" transform="rotate(-90 70 70)"/>
-                <text x="70" y="65" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="700">100%</text>
-                <text x="70" y="82" textAnchor="middle" fill="#a1a1aa" fontSize="11" fontWeight="600">TOTAL</text>
+
+          {/* Supply Mix */}
+          <motion.div className="sn-glass-card"
+            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.35 }}>
+            <div className="sn-card-header">
+              <span className="sn-card-title">Supply Mix</span>
+              <span className="sn-card-badge">BY SOURCE</span>
+            </div>
+            <div className="sn-donut-wrap">
+              <svg width="150" height="150" viewBox="0 0 140 140">
+                <defs>
+                  <filter id="donut-glow">
+                    <feGaussianBlur stdDeviation="2.5" result="b"/>
+                    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                </defs>
+                {/* track */}
+                <circle cx="70" cy="70" r="50" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="18"/>
+                {/* Gulf 41% */}
+                <circle cx="70" cy="70" r="50" fill="none" stroke="#ef4444" strokeWidth="18"
+                  strokeDasharray="129 314" transform="rotate(-90 70 70)" filter="url(#donut-glow)" opacity="0.9"/>
+                {/* Russia 27% */}
+                <circle cx="70" cy="70" r="50" fill="none" stroke="#f59e0b" strokeWidth="18"
+                  strokeDasharray="85 314" strokeDashoffset="-129" transform="rotate(-90 70 70)" filter="url(#donut-glow)" opacity="0.9"/>
+                {/* Brazil 32% */}
+                <circle cx="70" cy="70" r="50" fill="none" stroke="#10b981" strokeWidth="18"
+                  strokeDasharray="100 314" strokeDashoffset="-214" transform="rotate(-90 70 70)" filter="url(#donut-glow)" opacity="0.9"/>
+                <text x="70" y="62" textAnchor="middle" fill="#fff" fontSize="20" fontWeight="800">100%</text>
+                <text x="70" y="79" textAnchor="middle" fill="#64748b" fontSize="10" fontWeight="600" letterSpacing="1">TOTAL</text>
               </svg>
             </div>
-            <div className="sn-supply-breakdown">
-              <div className="sn-supply-item">
-                <div className="sn-supply-dot" style={{ background: '#ef4444' }}></div>
-                <span className="sn-supply-label">Gulf & Partner</span>
-                <span className="sn-supply-percent">41%</span>
-              </div>
-              <div className="sn-supply-item">
-                <div className="sn-supply-dot" style={{ background: '#f59e0b' }}></div>
-                <span className="sn-supply-label">Russia & Partner</span>
-                <span className="sn-supply-percent">27%</span>
-              </div>
-              <div className="sn-supply-item">
-                <div className="sn-supply-dot" style={{ background: '#10b981' }}></div>
-                <span className="sn-supply-label">Brazil & Others</span>
-                <span className="sn-supply-percent">32%</span>
-              </div>
+            <div className="sn-supply-rows">
+              {[
+                { label: 'Gulf & Partner',   pct: '41%', color: '#ef4444' },
+                { label: 'Russia & Partner', pct: '27%', color: '#f59e0b' },
+                { label: 'Brazil & Others',  pct: '32%', color: '#10b981' },
+              ].map(({ label, pct, color }) => (
+                <div className="sn-supply-row" key={label}>
+                  <span className="sn-supply-swatch" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
+                  <span className="sn-supply-label">{label}</span>
+                  <span className="sn-supply-pct" style={{ color }}>{pct}</span>
+                </div>
+              ))}
             </div>
-            <div className="sn-supply-message">
-              Diversification strengthens resilience against disruptions.
+            <div className="sn-supply-note">
+              ✦ Diversification strengthens resilience against disruptions.
             </div>
           </motion.div>
 
-          {/* Recent Activity Card */}
-          <motion.div
-            className="sn-activity-card"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <div className="sn-activity-header">
-              <span className="sn-card-title">RECENT ACTIVITY</span>
-              <span className="sn-view-all">View all</span>
+          {/* Recent Activity */}
+          <motion.div className="sn-glass-card"
+            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.45 }}>
+            <div className="sn-card-header">
+              <span className="sn-card-title">Recent Activity</span>
+              <span className="sn-view-all">View all →</span>
             </div>
             <div className="sn-activity-list">
-              {recentActivities.map(activity => (
-                <div key={activity.id} className="sn-activity-item">
-                  <div className={`sn-activity-icon ${activity.status}`}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <polyline points="12 6 12 12 16 14"/>
-                    </svg>
+              {recentActivities.map((a, i) => (
+                <motion.div key={a.id} className={`sn-activity-item ${a.status}`}
+                  initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.55 + i * 0.08 }}>
+                  <span className="sn-act-emoji">{a.emoji}</span>
+                  <div className="sn-act-body">
+                    <div className="sn-act-text">{a.text}</div>
+                    <div className="sn-act-time">{a.time}</div>
                   </div>
-                  <div className="sn-activity-content">
-                    <div className="sn-activity-text">{activity.text}</div>
-                    <div className="sn-activity-time">{activity.time}</div>
-                  </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* Always-on Vigilance Card - Right */}
-          <motion.div
-            className="sn-vigilance-card"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            <div className="sn-card-title">ALWAYS-ON VIGILANCE</div>
-            <div className="sn-vigilance-subtitle">Monitoring critical supply signals 24/7</div>
-            <div className="sn-vigilance-chart">
-              <svg width="100%" height="60" viewBox="0 0 90 40" preserveAspectRatio="none">
-                <path d={vigilancePath} fill="rgba(139, 92, 246, 0.1)" stroke="rgba(139, 92, 246, 0.6)" strokeWidth="1.5"/>
+          {/* Always-on Vigilance */}
+          <motion.div className="sn-glass-card vigilance-card"
+            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.55 }}>
+            <div className="sn-card-header">
+              <span className="sn-card-title">Always-On Vigilance</span>
+              <PulseRing color="#8b5cf6" />
+            </div>
+            <div className="sn-vigilance-sub">Monitoring critical supply signals 24/7</div>
+            <div className="sn-sparkline-wrap">
+              <svg width="100%" height="56" viewBox="0 0 120 40" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35"/>
+                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d={`${vPath} L 117 40 L 0 40 Z`} fill="url(#spark-fill)"/>
+                <path d={vPath} fill="none" stroke="#8b5cf6" strokeWidth="1.5"
+                  style={{ filter: 'drop-shadow(0 0 3px #8b5cf6)' }}/>
               </svg>
+            </div>
+            <div className="sn-vigilance-stats">
+              <div className="sn-vstat"><span className="sn-vstat-val">24/7</span><span className="sn-vstat-label">Monitoring</span></div>
+              <div className="sn-vstat"><span className="sn-vstat-val">3</span><span className="sn-vstat-label">Active Alerts</span></div>
+              <div className="sn-vstat"><span className="sn-vstat-val">99.9%</span><span className="sn-vstat-label">Uptime</span></div>
             </div>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* Bottom Instruction Bar */}
-      <motion.div
-        className="sn-instruction-bar"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.7 }}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span>Hover or click on any route to see details and <span className="highlight">explore alternatives</span>.</span>
-      </motion.div>
-
-      {/* Bottom Supply Chain Legend */}
-      <motion.div
-        className="sn-process-legend"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.8 }}
-      >
-        <div className="sn-process-step">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          </svg>
-          <div className="sn-process-label">
-            <div className="sn-process-title">Source</div>
-            <div className="sn-process-subtitle">(Suppliers)</div>
-          </div>
-        </div>
-        <div className="sn-process-arrow">→</div>
-        <div className="sn-process-step">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="11" width="18" height="10" rx="2"/>
-          </svg>
-          <div className="sn-process-label">
-            <div className="sn-process-title">Export</div>
-            <div className="sn-process-subtitle">(Ports)</div>
-          </div>
-        </div>
-        <div className="sn-process-arrow">→</div>
-        <div className="sn-process-step">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
-          </svg>
-          <div className="sn-process-label">
-            <div className="sn-process-title">Transit</div>
-            <div className="sn-process-subtitle">(Routes)</div>
-          </div>
-        </div>
-        <div className="sn-process-arrow">→</div>
-        <div className="sn-process-step">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-          </svg>
-          <div className="sn-process-label">
-            <div className="sn-process-title">Destination</div>
-            <div className="sn-process-subtitle">(Hub)</div>
-          </div>
-        </div>
-        <div className="sn-process-arrow">→</div>
-        <div className="sn-process-step">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M2 20h20"/>
-            <path d="M7 20V10l5-5 5 5v10"/>
-          </svg>
-          <div className="sn-process-label">
-            <div className="sn-process-title">Processing</div>
-            <div className="sn-process-subtitle">(Refineries)</div>
-          </div>
-        </div>
-        <div className="sn-process-arrow">→</div>
-        <div className="sn-process-step">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-          </svg>
-          <div className="sn-process-label">
-            <div className="sn-process-title">End Use</div>
-            <div className="sn-process-subtitle">(Operations)</div>
-          </div>
-        </div>
+      {/* ════ INSTRUCTION BAR ════ */}
+      <motion.div className="sn-instruction-bar"
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.65 }}>
+        <span className="sn-instr-icon">💬</span>
+        <span>Hover or click any route to see details and <span className="sn-highlight">explore alternatives</span>.</span>
       </motion.div>
     </div>
   );
