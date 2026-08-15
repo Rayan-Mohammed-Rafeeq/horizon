@@ -1,111 +1,225 @@
-.metric-card {
+/* ═══════════════════════════════════════════════
+   METRIC CARD — Gen-Z premium style
+   Uses CSS custom props set inline per card:
+   --accent, --accent-rgb, --glow, --gradient
+═══════════════════════════════════════════════ */
+
+.mc-card {
   position: relative;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  transition: all var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 16px 12px;
+  border-radius: 14px;
   overflow: hidden;
+  cursor: default;
+
+  /* Glass base */
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  /* Accent-coloured border */
+  border: 1px solid rgba(var(--accent-rgb), 0.22);
+
+  /* Outer glow */
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.08),
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  will-change: transform;
 }
 
-.metric-card::before {
-  content: '';
+/* ── Hover state ─────────────────────────────── */
+.mc-card:hover {
+  border-color: rgba(var(--accent-rgb), 0.45);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.15),
+    0 0 28px rgba(var(--accent-rgb), 0.18),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+/* ── Radial gradient background fill ─────────── */
+.mc-gradient-fill {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: transparent;
-  transition: all var(--transition-base);
+  inset: 0;
+  background: var(--gradient);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.metric-card.status-critical::before {
-  background: var(--gradient-critical);
+/* ── Noise texture overlay ───────────────────── */
+.mc-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
 }
 
-.metric-card.status-warning::before {
-  background: var(--gradient-warning);
+/* ── Animated corner highlight sweep ────────── */
+.mc-highlight {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.14) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  animation: highlightPulse 4s ease-in-out infinite;
 }
 
-.metric-card.status-success::before {
-  background: var(--gradient-success);
+@keyframes highlightPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1);   }
+  50%       { opacity: 1;   transform: scale(1.2); }
 }
 
-.metric-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-lg);
+/* ── Everything above overlays ───────────────── */
+.mc-top,
+.mc-label,
+.mc-value,
+.mc-desc,
+.mc-spark-wrap,
+.mc-trend,
+.mc-bar {
+  position: relative;
+  z-index: 2;
 }
 
-.metric-value {
-  font-size: 3rem;
+/* ── Top row: icon + tag ─────────────────────── */
+.mc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mc-icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  flex-shrink: 0;
+  transition: box-shadow 0.2s ease;
+}
+
+.mc-card:hover .mc-icon-wrap {
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4);
+}
+
+/* Tag chip */
+.mc-tag {
+  font-size: 0.575rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.1);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
+  border-radius: 100px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+/* ── Label ───────────────────────────────────── */
+.mc-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* ── Value ───────────────────────────────────── */
+.mc-value {
+  font-size: 2rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: var(--color-text-primary);
-  margin-bottom: 0.5rem;
+  color: #fff;
+  background: linear-gradient(135deg, #ffffff 40%, rgba(var(--accent-rgb), 0.85) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.metric-card.status-critical .metric-value {
-  color: var(--color-critical);
+.mc-desc {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.4;
+  margin-top: -2px;
 }
 
-.metric-card.status-warning .metric-value {
-  color: var(--color-warning);
+.mc-spark-wrap {
+  height: 32px;
+  margin: 0;
 }
 
-.metric-card.status-success .metric-value {
-  color: var(--color-success);
+.mc-sparkline-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-.metric-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.5rem;
+/* ── Trend row ───────────────────────────────── */
+.mc-trend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
 }
 
-.metric-description {
-  font-size: 0.8125rem;
-  color: var(--color-text-tertiary);
-  line-height: 1.5;
-}
+.mc-trend--up   { color: #EF4A5F; }
+.mc-trend--down { color: #F59E0B; }
+.mc-trend--neutral { color: rgba(255,255,255,0.3); }
 
-.metric-indicator {
+/* ── Bottom accent bar ───────────────────────── */
+.mc-bar {
   position: absolute;
   bottom: 0;
+  left: 0;
   right: 0;
-  width: 60px;
-  height: 60px;
-  opacity: 0.05;
-  border-radius: 50%;
-  transform: translate(30%, 30%);
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent) 40%,
+    rgba(var(--accent-rgb), 0.3) 100%
+  );
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
 }
 
-.metric-indicator.status-critical {
-  background: var(--color-critical);
+.mc-card:hover .mc-bar {
+  opacity: 1;
 }
 
-.metric-indicator.status-warning {
-  background: var(--color-warning);
-}
-
-.metric-indicator.status-success {
-  background: var(--color-success);
-}
-
-.metric-indicator.status-normal {
-  background: var(--color-accent-blue);
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 1024px) {
+  .mc-value { font-size: 2.2rem; }
 }
 
 @media (max-width: 768px) {
-  .metric-card {
-    padding: 1.25rem;
-  }
-  
-  .metric-value {
-    font-size: 2.5rem;
-  }
+  .mc-card  { padding: 18px 18px 14px; gap: 8px; }
+  .mc-value { font-size: 2rem; }
+  .mc-spark-wrap { height: 32px; }
 }

@@ -1,90 +1,318 @@
+/* ══════════════════════════════════════════
+   OVERVIEW — compact, fits 100vh at 100%
+══════════════════════════════════════════ */
+
 .overview-section {
-  padding: 2rem 0;
+  padding: 20px 0 32px;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
+/* ── Header ──────────────────────────────── */
 .section-header {
-  margin-bottom: 2rem;
+  margin-bottom: 16px;
 }
 
 .section-title {
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  color: var(--color-text-primary);
-  margin: 0 0 0.5rem 0;
   letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.1;
 }
 
 .section-subtitle {
-  font-size: 1.125rem;
+  font-size: 0.85rem;
   color: var(--color-text-secondary);
+  font-weight: 400;
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
+.highlight-text {
+  color: var(--color-primary);
+}
+
+/* ── Metrics Grid ────────────────────────── */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
+/* ── Supply Routes Section ───────────────── */
 .supply-routes-section {
-  margin-top: 2rem;
+  margin-top: 20px;
 }
 
 .section-subheader {
-  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.subheader-content {
+  flex: 1;
+  min-width: 0;
 }
 
 .section-subtitle-text {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 2px 0;
+  letter-spacing: -0.01em;
 }
 
 .section-description {
-  font-size: 0.9375rem;
+  font-size: 0.775rem;
   color: var(--color-text-tertiary);
   margin: 0;
+}
+
+/* Consumption Info */
+.consumption-info {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.consumption-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+}
+
+.consumption-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ── Routes + Mix layout ─────────────────── */
+.routes-and-mix-container {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 12px;
+  align-items: start;
 }
 
 .supply-routes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 12px;
 }
 
-@media (max-width: 1200px) {
+/* ── Supply Mix Panel ────────────────────── */
+.supply-mix-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 80px;
+}
+
+.mix-header {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.mix-donut {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  margin: 0 auto;
+}
+
+.donut-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.donut-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.donut-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.mix-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  flex: 1;
+  font-size: 0.72rem;
+}
+
+.legend-value {
+  color: var(--color-text-primary);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.mix-note {
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--color-text-tertiary);
+  font-style: italic;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── Horizon Insight Card ────────────────── */
+.horizon-insight {
+  margin-top: 16px;
+  padding: 18px 28px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.insight-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.insight-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.insight-quote {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+}
+
+.insight-tagline {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+.horizon-brand {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.insight-decoration {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  opacity: 0.15;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.signal-wave { width: 100%; height: 100%; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 1400px) {
+  .routes-and-mix-container {
+    grid-template-columns: 1fr;
+  }
+  .supply-mix-panel {
+    position: static;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 12px 24px;
+    align-items: start;
+    max-width: 100%;
+  }
+  .mix-header { grid-column: 1 / -1; }
+  .mix-donut  { width: 90px; height: 90px; }
+  .mix-note   { grid-column: 1 / -1; }
+}
+
+@media (max-width: 1100px) {
   .metrics-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
   .supply-routes-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .overview-section {
-    padding: 1.5rem 0;
-  }
-  
-  .section-title {
-    font-size: 2rem;
-  }
-  
-  .section-subtitle {
-    font-size: 1rem;
-  }
-  
-  .metrics-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .supply-routes-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+  .overview-section { padding: 14px 0 24px; }
+  .section-title    { font-size: 1.4rem; }
+  .metrics-grid     { grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+  .supply-routes-section { margin-top: 16px; }
+  .supply-routes-grid    { grid-template-columns: 1fr; gap: 10px; }
+  .horizon-insight  { padding: 16px; flex-direction: column; text-align: center; }
+  .insight-quote    { font-size: 0.88rem; }
+  .consumption-info { flex-direction: column; gap: 2px; align-items: flex-start; }
 }

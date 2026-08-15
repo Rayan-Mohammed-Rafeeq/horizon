@@ -1,19 +1,15 @@
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin, AlertTriangle, Factory } from 'lucide-react';
 import BarrelInventory from './BarrelInventory';
 import './SupplyRouteCard.css';
 
 const SupplyRouteCard = ({ route, delay = 0, onClick }) => {
   const getRiskBadgeClass = (risk) => {
     switch (risk) {
-      case 'HIGH':
-        return 'badge-critical';
-      case 'MEDIUM':
-        return 'badge-warning';
-      case 'LOW':
-        return 'badge-success';
-      default:
-        return 'badge-neutral';
+      case 'HIGH':   return 'badge-critical';
+      case 'MEDIUM': return 'badge-warning';
+      case 'LOW':    return 'badge-success';
+      default:       return 'badge-neutral';
     }
   };
 
@@ -24,45 +20,60 @@ const SupplyRouteCard = ({ route, delay = 0, onClick }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
       onClick={onClick}
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
     >
-      {/* Route Name */}
+      {/* Header */}
       <div className="route-header">
         <h4 className="route-name">{route.name}</h4>
-        <span className={`badge ${getRiskBadgeClass(route.risk)}`}>
-          {route.risk}
-        </span>
+        <span className={`badge ${getRiskBadgeClass(route.risk)}`}>{route.risk}</span>
       </div>
 
-      {/* Route Path */}
-      <div className="route-path">
-        <div className="route-node">
-          <div className="node-label">{route.origin}</div>
+      {/* Route Path — horizontal flow */}
+      <div className="route-path-flow">
+        {/* Origin */}
+        <div className="flow-node">
+          <div className="flow-icon origin">
+            <MapPin size={12} />
+          </div>
+          <div className="flow-label">{route.origin}</div>
         </div>
-        
-        <ArrowRight size={16} className="route-arrow" />
-        
+
+        <div className="flow-connector">
+          <div className="flow-line" />
+          <ArrowRight size={12} className="flow-arrow" />
+        </div>
+
+        {/* Chokepoint */}
         {route.chokepoint && (
           <>
-            <div className="route-node chokepoint">
-              <div className="node-label">{route.chokepoint}</div>
+            <div className="flow-node">
+              <div className="flow-icon chokepoint">
+                <AlertTriangle size={12} />
+              </div>
+              <div className="flow-label danger">{route.chokepoint}</div>
             </div>
-            <ArrowRight size={16} className="route-arrow" />
+            <div className="flow-connector">
+              <div className="flow-line" />
+              <ArrowRight size={12} className="flow-arrow" />
+            </div>
           </>
         )}
-        
-        <div className="route-node">
-          <div className="node-label">{route.destination}</div>
+
+        {/* Destination */}
+        <div className="flow-node">
+          <div className="flow-icon destination">
+            <Factory size={12} />
+          </div>
+          <div className="flow-label">{route.destination}</div>
         </div>
       </div>
 
-      {/* Route Metrics */}
+      {/* Metrics */}
       <div className="route-metrics">
         <div className="route-metric">
           <div className="metric-label-small">Dependency</div>
           <div className="metric-value-small">{route.dependency}%</div>
         </div>
-        
         <div className="route-metric">
           <div className="metric-label-small">Inventory</div>
           <div className="metric-value-small">{route.inventoryDays} days</div>
@@ -71,12 +82,15 @@ const SupplyRouteCard = ({ route, delay = 0, onClick }) => {
 
       {/* Barrel Visualization */}
       <div className="route-inventory">
-        <BarrelInventory 
-          count={route.barrelCount} 
+        <BarrelInventory
+          count={route.barrelCount}
           total={5}
           daysRemaining={route.inventoryDays}
+          compact={true}
         />
       </div>
+
+      <div className={`route-glow risk-${route.risk.toLowerCase()}`} />
     </motion.div>
   );
 };

@@ -1,89 +1,154 @@
-import { Home, Network, AlertTriangle, Activity, Shield, TrendingDown, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Network, AlertTriangle, Activity, Shield, TrendingDown, X, ChevronsLeft, ChevronsRight, Zap } from 'lucide-react';
 import './Sidebar.css';
 
 const navigationItems = [
-  { id: 'overview', label: 'OVERVIEW', icon: Home },
-  { id: 'supply-network', label: 'SUPPLY NETWORK', icon: Network },
-  { id: 'early-warning', label: 'EARLY WARNING', icon: AlertTriangle },
-  { id: 'scenarios', label: 'SCENARIOS', icon: Activity },
-  { id: 'strategy', label: 'STRATEGY', icon: Shield },
-  { id: 'impact', label: 'IMPACT', icon: TrendingDown },
+  { id: 'overview',        label: 'Overview',        icon: Home,          shortcut: '01' },
+  { id: 'supply-network',  label: 'Supply Network',  icon: Network,       shortcut: '02' },
+  { id: 'early-warning',   label: 'Early Warning',   icon: AlertTriangle, shortcut: '03', alert: true },
+  { id: 'scenarios',       label: 'Scenarios',       icon: Activity,      shortcut: '04' },
+  { id: 'strategy',        label: 'Strategy',        icon: Shield,        shortcut: '05' },
+  { id: 'impact',          label: 'Impact',          icon: TrendingDown,  shortcut: '06' },
 ];
 
 const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile, isCollapsed, onToggleCollapse }) => {
   const handleNavClick = (sectionId) => {
     onNavigate(sectionId);
-    if (isMobile && onClose) {
-      onClose();
-    }
+    if (isMobile && onClose) onClose();
   };
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobile && isOpen && (
         <div className="sidebar-overlay" onClick={onClose} />
       )}
-      
-      {/* Sidebar */}
+
       <aside className={`sidebar ${isOpen ? 'open' : ''} ${isCollapsed && !isMobile ? 'collapsed' : ''}`}>
-        {/* Mobile Close Button */}
-        {isMobile && (
-          <button className="sidebar-close" onClick={onClose}>
-            <X size={20} />
-          </button>
-        )}
-        
-        {/* Desktop Toggle Button */}
-        {!isMobile && (
+
+        {/* Noise texture */}
+        <div className="sidebar-noise" />
+
+        {/* Desktop Toggle — only show when expanded */}
+        {!isMobile && !isCollapsed && (
           <button 
             className="sidebar-toggle" 
             onClick={onToggleCollapse}
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label="Collapse sidebar"
           >
-            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            <ChevronsLeft size={14} />
           </button>
         )}
-        
-        {/* Navigation */}
+
+        {/* Expand tab — only show when collapsed, sits on right edge */}
+        {!isMobile && isCollapsed && (
+          <button
+            className="sidebar-expand-tab"
+            onClick={onToggleCollapse}
+            aria-label="Expand sidebar"
+          >
+            <ChevronsRight size={13} />
+          </button>
+        )}
+
+        {isMobile && (
+          <button className="sidebar-close" onClick={onClose}>
+            <X size={18} />
+          </button>
+        )}
+
+        {/* ── Logo ─────────────────────────── */}
+        {!isCollapsed ? (
+          <div className="sidebar-header">
+            <div className="logo-lockup">
+              <div className="logo-ring">
+                <img src="/logo.svg" alt="Horizon" className="logo-image" />
+                <div className="logo-ring-border" />
+              </div>
+              <div className="sidebar-brand">
+                <div className="brand-name">HORIZON</div>
+                <div className="brand-tagline">Energy Continuity Intelligence</div>
+              </div>
+            </div>
+            {/* Risk pulse bar */}
+            <div className="risk-pulse-bar">
+              <div className="rpb-label">RISK LEVEL</div>
+              <div className="rpb-track">
+                <div className="rpb-fill" />
+              </div>
+              <div className="rpb-value">78</div>
+            </div>
+          </div>
+        ) : (
+          <div className="sidebar-header-collapsed">
+            <div className="logo-ring small">
+              <img src="/logo.svg" alt="Horizon" className="logo-image-small" />
+              <div className="logo-ring-border" />
+            </div>
+          </div>
+        )}
+
+        {/* ── Nav label ────────────────────── */}
+        {!isCollapsed && (
+          <div className="nav-section-label">NAVIGATION</div>
+        )}
+
+        {/* ── Navigation ───────────────────── */}
         <nav className="sidebar-nav">
           <div className="nav-items">
             {navigationItems.map((item) => {
               const Icon = item.icon;
+              const isActive = activeSection === item.id;
               return (
                 <button
                   key={item.id}
-                  className={`nav-item ${activeSection === item.id ? 'active' : ''}`}
+                  className={`nav-item ${isActive ? 'active' : ''}`}
                   onClick={() => handleNavClick(item.id)}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <Icon size={18} className="nav-icon" />
-                  {!isCollapsed && <span className="nav-label">{item.label}</span>}
+                  {/* Active glow bg */}
+                  {isActive && <div className="nav-item-glow" />}
+
+                  <div className={`nav-icon-wrap ${isActive ? 'active' : ''}`}>
+                    <Icon size={15} strokeWidth={isActive ? 2.5 : 2} />
+                    {item.alert && !isActive && (
+                      <span className="nav-alert-dot" />
+                    )}
+                  </div>
+
+                  {!isCollapsed && (
+                    <>
+                      <span className="nav-label">{item.label}</span>
+                      <span className="nav-shortcut">{item.shortcut}</span>
+                    </>
+                  )}
                 </button>
               );
             })}
           </div>
         </nav>
 
-        {/* Bottom Branding */}
+        {/* ── Footer ───────────────────────── */}
         {!isCollapsed && (
           <div className="sidebar-footer">
-            <div className="footer-brand">
-              <div className="footer-logo">
-                <img src="/logo.svg" alt="Horizon Logo" className="logo-image" />
-              </div>
-              <div className="footer-text">
-                <div className="footer-title">HORIZON</div>
-                <div className="footer-subtitle">Energy Continuity Intelligence</div>
-              </div>
+            {/* Version */}
+            <div className="sidebar-version">
+              <span className="version-label">HORIZON</span>
+              <span className="version-num">v1.0</span>
+              <div className="version-divider" />
+              <span className="version-copy">© 2028 Horizon Intelligence</span>
+            </div>
+
+            {/* Status row */}
+            <div className="footer-status">
+              <div className="fs-dot" />
+              <span className="fs-label">Always-on Vigilance</span>
+              <Zap size={10} className="fs-zap" />
             </div>
           </div>
         )}
-        
-        {/* Collapsed Footer - Just Logo */}
+
         {isCollapsed && !isMobile && (
           <div className="sidebar-footer-collapsed">
-            <img src="/logo.svg" alt="Horizon Logo" className="logo-image-small" />
+            <div className="fs-dot" />
           </div>
         )}
       </aside>

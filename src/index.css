@@ -10,52 +10,75 @@
 }
 
 :root {
-  /* Color System */
-  --color-bg-primary: #0a0a0b;
-  --color-bg-secondary: #13141a;
-  --color-bg-tertiary: #1a1b23;
-  --color-bg-elevated: #20212b;
+  /* Premium Dark Color System - Horizon */
+  --color-bg-primary: #05070D;
+  --color-bg-secondary: #080B12;
+  --color-bg-tertiary: #0C1018;
+  --color-bg-elevated: #111620;
   
-  --color-surface: #1a1b23;
-  --color-surface-elevated: #252632;
-  --color-surface-hover: #2a2b38;
+  --color-surface: #0C1018;
+  --color-surface-elevated: #111620;
+  --color-surface-hover: #161B28;
   
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(255, 255, 255, 0.12);
-  --color-border-accent: rgba(99, 102, 241, 0.3);
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-strong: rgba(255, 255, 255, 0.1);
+  --color-border-accent: rgba(124, 92, 255, 0.3);
   
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a1a1aa;
-  --color-text-tertiary: #71717a;
-  --color-text-muted: #52525b;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #9CA3AF;
+  --color-text-tertiary: #6B7280;
+  --color-text-muted: #4B5563;
   
   /* Status Colors */
-  --color-critical: #ef4444;
-  --color-critical-bg: rgba(239, 68, 68, 0.1);
-  --color-critical-border: rgba(239, 68, 68, 0.3);
+  --color-critical: #EF4A5F;
+  --color-critical-bg: rgba(239, 74, 95, 0.08);
+  --color-critical-border: rgba(239, 74, 95, 0.25);
+  --color-critical-glow: rgba(239, 74, 95, 0.4);
   
-  --color-warning: #f59e0b;
-  --color-warning-bg: rgba(245, 158, 11, 0.1);
-  --color-warning-border: rgba(245, 158, 11, 0.3);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.08);
+  --color-warning-border: rgba(245, 158, 11, 0.25);
+  --color-warning-glow: rgba(245, 158, 11, 0.4);
   
-  --color-success: #10b981;
-  --color-success-bg: rgba(16, 185, 129, 0.1);
-  --color-success-border: rgba(16, 185, 129, 0.3);
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.08);
+  --color-success-border: rgba(16, 185, 129, 0.25);
+  --color-success-glow: rgba(16, 185, 129, 0.4);
   
-  --color-info: #3b82f6;
-  --color-info-bg: rgba(59, 130, 246, 0.1);
-  --color-info-border: rgba(59, 130, 246, 0.3);
+  --color-info: #3B82F6;
+  --color-info-bg: rgba(59, 130, 246, 0.08);
+  --color-info-border: rgba(59, 130, 246, 0.25);
+  
+  /* Horizon Brand - Electric Violet/Indigo */
+  --color-primary: #7C5CFF;
+  --color-primary-dark: #6D5DFB;
+  --color-primary-light: #8F7AFF;
+  --color-primary-bg: rgba(124, 92, 255, 0.08);
+  --color-primary-border: rgba(124, 92, 255, 0.25);
+  --color-primary-glow: rgba(124, 92, 255, 0.4);
+  
+  /* Secondary - Electric Blue/Cyan */
+  --color-secondary: #06B6D4;
+  --color-secondary-bg: rgba(6, 182, 212, 0.08);
+  --color-secondary-border: rgba(6, 182, 212, 0.25);
+  --color-secondary-glow: rgba(6, 182, 212, 0.4);
   
   /* Accent Colors */
-  --color-accent-blue: #6366f1;
-  --color-accent-violet: #8b5cf6;
-  --color-accent-amber: #f59e0b;
+  --color-accent-blue: #6366F1;
+  --color-accent-violet: #7C5CFF;
+  --color-accent-amber: #F59E0B;
   
   /* Gradients */
-  --gradient-blue: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --gradient-critical: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-primary: linear-gradient(135deg, #7C5CFF 0%, #6D5DFB 100%);
+  --gradient-secondary: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+  --gradient-critical: linear-gradient(135deg, #EF4A5F 0%, #DC2626 100%);
+  --gradient-warning: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --gradient-success: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  
+  /* Glass Effect */
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-blur: blur(12px);
   
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -72,11 +95,14 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  /* Shadows - Enhanced for depth */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  --shadow-glow-primary: 0 0 20px var(--color-primary-glow);
+  --shadow-glow-critical: 0 0 20px var(--color-critical-glow);
+  --shadow-glow-warning: 0 0 20px var(--color-warning-glow);
   
   /* Glass Effect */
   --glass-bg: rgba(255, 255, 255, 0.03);
@@ -235,14 +261,14 @@ p {
 }
 
 .btn-primary {
-  background: var(--gradient-blue);
+  background: var(--gradient-primary);
   color: white;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 20px var(--color-primary-glow);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 30px var(--color-primary-glow), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .btn-secondary {
@@ -355,7 +381,7 @@ p {
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 var(--spacing-xl);
+  padding: 0 1.25rem;
 }
 
 /* Grid System */
@@ -482,10 +508,21 @@ p {
 
 @keyframes glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 20px var(--color-primary-glow);
   }
   50% {
-    box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 40px var(--color-primary-glow);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px var(--color-primary-glow));
+  }
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 16px var(--color-primary-glow));
   }
 }
 
