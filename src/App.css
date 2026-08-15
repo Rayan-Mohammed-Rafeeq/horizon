@@ -13,7 +13,7 @@
 }
 
 .main-content.with-sidebar {
-  margin-left: 260px;
+  margin-left: 240px;
 }
 
 .main-content.with-sidebar-collapsed {
@@ -22,7 +22,7 @@
 
 .content-area {
   flex: 1;
-  padding: 2rem 0;
+  padding: 0;
   overflow-x: hidden;
 }
 
