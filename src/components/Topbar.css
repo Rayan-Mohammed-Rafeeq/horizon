@@ -1,0 +1,215 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(12px);
+}
+
+.topbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.5rem;
+  gap: 1.5rem;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-button {
+  padding: 0.5rem;
+  display: none;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  background: var(--gradient-blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background: var(--color-critical-bg);
+  border: 1px solid var(--color-critical-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-critical);
+}
+
+.pulse-icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.topbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.company-info {
+  text-align: center;
+}
+
+.company-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.company-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  margin-top: 0.125rem;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.risk-status {
+  text-align: right;
+}
+
+.risk-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.125rem;
+}
+
+.risk-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+.risk-value.high {
+  background: var(--color-critical-bg);
+  color: var(--color-critical);
+  border: 1px solid var(--color-critical-border);
+}
+
+.risk-value.medium {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+.risk-value.low {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.timestamp {
+  text-align: right;
+}
+
+.timestamp-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.125rem;
+}
+
+.timestamp-value {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.demo-banner {
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.1) 0%, 
+    rgba(245, 158, 11, 0.15) 50%, 
+    rgba(245, 158, 11, 0.1) 100%
+  );
+  border-top: 1px solid var(--color-warning-border);
+  padding: 0.375rem;
+  text-align: center;
+}
+
+.demo-banner-text {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-warning);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .topbar-right {
+    gap: 1rem;
+  }
+  
+  .timestamp {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-button {
+    display: flex;
+  }
+  
+  .topbar-content {
+    padding: 0.75rem 1rem;
+  }
+  
+  .live-indicator {
+    display: none;
+  }
+  
+  .company-info {
+    text-align: left;
+  }
+  
+  .topbar-center {
+    justify-content: flex-start;
+  }
+  
+  .company-name {
+    font-size: 0.8125rem;
+  }
+  
+  .topbar-right {
+    gap: 0.75rem;
+  }
+  
+  .risk-status {
+    display: none;
+  }
+}

@@ -1,0 +1,111 @@
+.metric-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: all var(--transition-base);
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: all var(--transition-base);
+}
+
+.metric-card.status-critical::before {
+  background: var(--gradient-critical);
+}
+
+.metric-card.status-warning::before {
+  background: var(--gradient-warning);
+}
+
+.metric-card.status-success::before {
+  background: var(--gradient-success);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-lg);
+}
+
+.metric-value {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.metric-card.status-critical .metric-value {
+  color: var(--color-critical);
+}
+
+.metric-card.status-warning .metric-value {
+  color: var(--color-warning);
+}
+
+.metric-card.status-success .metric-value {
+  color: var(--color-success);
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.metric-description {
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+
+.metric-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  opacity: 0.05;
+  border-radius: 50%;
+  transform: translate(30%, 30%);
+}
+
+.metric-indicator.status-critical {
+  background: var(--color-critical);
+}
+
+.metric-indicator.status-warning {
+  background: var(--color-warning);
+}
+
+.metric-indicator.status-success {
+  background: var(--color-success);
+}
+
+.metric-indicator.status-normal {
+  background: var(--color-accent-blue);
+}
+
+@media (max-width: 768px) {
+  .metric-card {
+    padding: 1.25rem;
+  }
+  
+  .metric-value {
+    font-size: 2.5rem;
+  }
+}
