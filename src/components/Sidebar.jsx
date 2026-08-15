@@ -1,4 +1,4 @@
-import { Home, Network, AlertTriangle, Activity, Shield, TrendingDown, X } from 'lucide-react';
+import { Home, Network, AlertTriangle, Activity, Shield, TrendingDown, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import './Sidebar.css';
 
 const navigationItems = [
@@ -10,7 +10,7 @@ const navigationItems = [
   { id: 'impact', label: 'IMPACT', icon: TrendingDown },
 ];
 
-const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile }) => {
+const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile, isCollapsed, onToggleCollapse }) => {
   const handleNavClick = (sectionId) => {
     onNavigate(sectionId);
     if (isMobile && onClose) {
@@ -26,11 +26,22 @@ const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile }) => {
       )}
       
       {/* Sidebar */}
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${isOpen ? 'open' : ''} ${isCollapsed && !isMobile ? 'collapsed' : ''}`}>
         {/* Mobile Close Button */}
         {isMobile && (
           <button className="sidebar-close" onClick={onClose}>
             <X size={20} />
+          </button>
+        )}
+        
+        {/* Desktop Toggle Button */}
+        {!isMobile && (
+          <button 
+            className="sidebar-toggle" 
+            onClick={onToggleCollapse}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
         )}
         
@@ -44,9 +55,10 @@ const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile }) => {
                   key={item.id}
                   className={`nav-item ${activeSection === item.id ? 'active' : ''}`}
                   onClick={() => handleNavClick(item.id)}
+                  title={isCollapsed ? item.label : undefined}
                 >
                   <Icon size={18} className="nav-icon" />
-                  <span className="nav-label">{item.label}</span>
+                  {!isCollapsed && <span className="nav-label">{item.label}</span>}
                 </button>
               );
             })}
@@ -54,17 +66,26 @@ const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile }) => {
         </nav>
 
         {/* Bottom Branding */}
-        <div className="sidebar-footer">
-          <div className="footer-brand">
-            <div className="footer-logo">
-              <div className="logo-icon">H</div>
-            </div>
-            <div className="footer-text">
-              <div className="footer-title">HORIZON</div>
-              <div className="footer-subtitle">Energy Continuity Intelligence</div>
+        {!isCollapsed && (
+          <div className="sidebar-footer">
+            <div className="footer-brand">
+              <div className="footer-logo">
+                <img src="/logo.svg" alt="Horizon Logo" className="logo-image" />
+              </div>
+              <div className="footer-text">
+                <div className="footer-title">HORIZON</div>
+                <div className="footer-subtitle">Energy Continuity Intelligence</div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+        
+        {/* Collapsed Footer - Just Logo */}
+        {isCollapsed && !isMobile && (
+          <div className="sidebar-footer-collapsed">
+            <img src="/logo.svg" alt="Horizon Logo" className="logo-image-small" />
+          </div>
+        )}
       </aside>
     </>
   );

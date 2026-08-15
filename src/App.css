@@ -16,6 +16,10 @@
   margin-left: 260px;
 }
 
+.main-content.with-sidebar-collapsed {
+  margin-left: 72px;
+}
+
 .content-area {
   flex: 1;
   padding: 2rem 0;
@@ -34,7 +38,8 @@ html {
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
-  .main-content.with-sidebar {
+  .main-content.with-sidebar,
+  .main-content.with-sidebar-collapsed {
     margin-left: 0;
   }
   

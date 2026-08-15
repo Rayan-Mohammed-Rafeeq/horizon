@@ -19,6 +19,7 @@ const Topbar = ({ onMenuClick, showMenuButton = false }) => {
           )}
           
           <div className="topbar-brand">
+            <img src="/logo.svg" alt="Horizon Logo" className="brand-logo" />
             <h1 className="brand-name">HORIZON</h1>
             <div className="live-indicator">
               <Activity size={12} className="pulse-icon" />

@@ -13,6 +13,7 @@ import './App.css';
 function App() {
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -49,6 +50,10 @@ function App() {
     setSidebarOpen(false);
   };
 
+  const handleToggleCollapse = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   // Update active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
@@ -82,10 +87,12 @@ function App() {
         isOpen={sidebarOpen}
         onClose={handleCloseSidebar}
         isMobile={isMobile}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={handleToggleCollapse}
       />
 
       {/* Main Content */}
-      <div className={`main-content ${isMobile ? '' : 'with-sidebar'}`}>
+      <div className={`main-content ${isMobile ? '' : sidebarCollapsed ? 'with-sidebar-collapsed' : 'with-sidebar'}`}>
         {/* Topbar */}
         <Topbar 
           onMenuClick={handleMenuClick} 
