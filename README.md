@@ -8,7 +8,7 @@
 
 *When global supply routes fail, your business doesn't have to.*
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Vercel-black?style=for-the-badge)](https://github.com/Rayan-Mohammed-Rafeeq/horizon)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Vercel-black?style=for-the-badge)](https://rayan-polyinnovae-ai.vercel.app)
 [![Watch Video](https://img.shields.io/badge/📹_Watch-Product_Tour-red?style=for-the-badge)](https://www.loom.com/share/5ec0e1a244f346ada52f1ed3f7a301fa)
 [![Portfolio](https://img.shields.io/badge/💼_Portfolio-rayanbuilds.me-blue?style=for-the-badge)](https://rayanbuilds.me)
 
