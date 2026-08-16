@@ -13,6 +13,7 @@
   z-index: 100;
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  zoom: 1; /* reset any inherited zoom from docs page */
 
   /* Layered background */
   background:
@@ -212,12 +213,10 @@
 
 .brand-name {
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.12em;
-  background: linear-gradient(135deg, #fff 30%, rgba(124, 92, 255, 0.9) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #C0C0C0;
+  text-transform: uppercase;
 }
 
 .brand-tagline {
@@ -551,3 +550,83 @@
 .sidebar-nav::-webkit-scrollbar       { width: 3px; }
 .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
 .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE OVERRIDES
+═══════════════════════════════════════════ */
+
+[data-theme="light"] .sidebar {
+  background:
+    linear-gradient(180deg,
+      rgba(124, 92, 255, 0.03) 0%,
+      transparent 40%,
+      rgba(6, 182, 212, 0.02) 100%),
+    #FFFFFF;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .sidebar-noise {
+  opacity: 0.015;
+}
+
+[data-theme="light"] .nav-item {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="light"] .nav-item:hover {
+  background: rgba(124, 92, 255, 0.06);
+  color: var(--color-text-primary);
+}
+
+[data-theme="light"] .nav-item.active {
+  background: rgba(124, 92, 255, 0.1);
+  color: var(--color-primary);
+}
+
+[data-theme="light"] .logo-ring-border {
+  background: conic-gradient(from 180deg, #7C5CFF, #06B6D4, #7C5CFF);
+  opacity: 0.3;
+}
+
+[data-theme="light"] .brand-name {
+  color: #000000;
+  font-weight: 900;
+}
+
+[data-theme="light"] .brand-tagline {
+  color: #64748B;
+}
+
+[data-theme="light"] .rpb-label {
+  color: #64748B;
+}
+
+[data-theme="light"] .rpb-value {
+  color: #0F172A;
+}
+
+[data-theme="light"] .rpb-track {
+  background: rgba(0,0,0,0.08);
+}
+
+[data-theme="light"] .rpb-fill {
+  background: linear-gradient(90deg, #7C5CFF, #EC4899);
+}
+
+[data-theme="light"] .nav-section-label,
+[data-theme="light"] .nav-divider-label {
+  color: #64748B;
+}
+
+[data-theme="light"] .version-label,
+[data-theme="light"] .version-num {
+  color: #0F172A;
+}
+
+[data-theme="light"] .version-copy {
+  color: #94A3B8;
+}
+
+[data-theme="light"] .fs-label {
+  color: #64748B;
+}

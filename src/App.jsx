@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 import Overview from './components/Overview';
@@ -8,65 +8,76 @@ import EarlyWarning from './components/EarlyWarning';
 import ScenarioSimulator from './components/ScenarioSimulator';
 import Strategy from './components/Strategy';
 import Impact from './components/Impact';
+import Docs from './components/Docs';
 import './App.css';
+
+const DASHBOARD_SECTIONS = ['overview', 'supply-network', 'early-warning', 'scenarios', 'strategy', 'impact'];
 
 function App() {
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isManualNav, setIsManualNav] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    // Load theme from localStorage or default to 'dark'
+    return localStorage.getItem('horizon-theme') || 'dark';
+  });
+
+  // true when the Docs view is open — completely separate from the scroll layout
+  const isDocsMode = activeSection === 'docs';
+
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('horizon-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const handleNavigate = (sectionId) => {
     setActiveSection(sectionId);
-    
-    // Smooth scroll to section
+    setIsManualNav(true);
+
+    // Re-enable scroll-spy after scroll animation completes
+    setTimeout(() => setIsManualNav(false), 1000);
+
+    if (sectionId === 'docs') {
+      // Docs is a separate view — scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (isMobile) setSidebarOpen(false);
+      return;
+    }
+
+    // Scroll to the section within the dashboard
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    
-    // Close mobile sidebar after navigation
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
+
+    if (isMobile) setSidebarOpen(false);
   };
 
-  const handleMenuClick = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const handleCloseSidebar = () => {
-    setSidebarOpen(false);
-  };
-
-  const handleToggleCollapse = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-
-  // Update active section based on scroll position
+  // Scroll-spy — only active when NOT in docs mode AND not during manual navigation
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['overview', 'supply-network', 'early-warning', 'scenarios', 'strategy', 'impact'];
-      const scrollPosition = window.scrollY + 200;
+    if (isDocsMode || isManualNav) return;
 
-      for (const sectionId of sections) {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 200;
+      for (const sectionId of DASHBOARD_SECTIONS) {
         const element = document.getElementById(sectionId);
         if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetBottom = offsetTop + element.offsetHeight;
-
-          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
             setActiveSection(sectionId);
             break;
           }
@@ -76,45 +87,64 @@ function App() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isDocsMode, isManualNav]);
+
+  const sidebarClass = isMobile ? '' : sidebarCollapsed ? 'with-sidebar-collapsed' : 'with-sidebar';
 
   return (
     <div className="app">
-      {/* Sidebar */}
       <Sidebar
         activeSection={activeSection}
         onNavigate={handleNavigate}
         isOpen={sidebarOpen}
-        onClose={handleCloseSidebar}
+        onClose={() => setSidebarOpen(false)}
         isMobile={isMobile}
         isCollapsed={sidebarCollapsed}
-        onToggleCollapse={handleToggleCollapse}
+        onToggleCollapse={() => setSidebarCollapsed(c => !c)}
       />
 
-      {/* Main Content */}
-      <div className={`main-content ${isMobile ? '' : sidebarCollapsed ? 'with-sidebar-collapsed' : 'with-sidebar'}`}>
-        {/* Topbar */}
+      <div className={`main-content ${sidebarClass}`}>
         <Topbar 
-          onMenuClick={handleMenuClick} 
+          onMenuClick={() => setSidebarOpen(o => !o)} 
           showMenuButton={isMobile}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
 
-        {/* Content Area */}
-        <motion.div 
-          className="content-area"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="container">
-            <Overview onNavigate={handleNavigate} />
-            <SupplyNetwork />
-            <EarlyWarning onNavigate={handleNavigate} />
-            <ScenarioSimulator onNavigate={handleNavigate} />
-            <Strategy />
-            <Impact />
-          </div>
-        </motion.div>
+        <AnimatePresence mode="wait">
+          {isDocsMode ? (
+            /* ── DOCS MODE — completely isolated, no scroll connection ── */
+            <motion.div
+              key="docs"
+              className="content-area docs-standalone"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <Docs />
+            </motion.div>
+          ) : (
+            /* ── DASHBOARD MODE — normal scrollable layout ── */
+            <motion.div
+              key="dashboard"
+              className="content-area"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <div className="container">
+                <Overview onNavigate={handleNavigate} />
+                <SupplyNetwork />
+                <EarlyWarning onNavigate={handleNavigate} />
+                <ScenarioSimulator onNavigate={handleNavigate} />
+                <Strategy />
+                <Impact />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

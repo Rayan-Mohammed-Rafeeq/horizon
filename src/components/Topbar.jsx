@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Menu, Zap, Shield, Globe, ChevronDown } from 'lucide-react';
+import { Menu, Zap, Shield, Globe, ChevronDown, Sun, Moon } from 'lucide-react';
 import { company } from '../data/demoData';
 import './Topbar.css';
 
-const Topbar = ({ onMenuClick, showMenuButton = false }) => {
+const Topbar = ({ onMenuClick, showMenuButton = false, theme, onToggleTheme }) => {
   const [time, setTime] = useState('');
   const [date, setDate] = useState('');
 
@@ -72,6 +72,19 @@ const Topbar = ({ onMenuClick, showMenuButton = false }) => {
 
         {/* ── RIGHT ──────────────────────────── */}
         <div className="topbar-right">
+
+          {/* Theme toggle */}
+          <button 
+            className="theme-toggle"
+            onClick={onToggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? (
+              <Sun size={16} strokeWidth={2} />
+            ) : (
+              <Moon size={16} strokeWidth={2} />
+            )}
+          </button>
 
           {/* Demo badge */}
           <div className="demo-pill">
