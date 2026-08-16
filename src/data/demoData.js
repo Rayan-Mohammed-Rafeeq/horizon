@@ -168,20 +168,26 @@ export const scenarios = {
 export const getInventoryTimeline = (duration) => {
   const data = [];
   const inventoryRunway = 17;
+  const criticalThreshold = 10; // Critical threshold at 10 days of inventory
   
-  for (let day = 0; day <= duration; day += Math.ceil(duration / 20)) {
-    let inventory = 100;
+  for (let day = 0; day <= duration; day++) {
+    let inventory = 30; // Start at 30 days
     
-    if (day > inventoryRunway) {
-      inventory = 0;
+    if (day <= inventoryRunway) {
+      inventory = Math.max(0, 30 - (day / inventoryRunway) * 30);
     } else {
-      inventory = Math.max(0, 100 - (day / inventoryRunway) * 100);
+      // After day 17, inventory reaches 0 and stays there
+      inventory = 0;
     }
+    
+    // Create the critical area when inventory drops below threshold
+    const criticalArea = inventory > 0 && inventory < criticalThreshold ? inventory : 0;
     
     data.push({
       day,
-      inventory: Math.round(inventory),
-      critical: day > inventoryRunway
+      inventory: Number(inventory.toFixed(1)),
+      critical: criticalThreshold,
+      criticalArea: criticalArea > 0 ? Number(criticalArea.toFixed(1)) : null
     });
   }
   

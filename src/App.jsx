@@ -27,15 +27,8 @@ function App() {
   // true when the Docs view is open — completely separate from the scroll layout
   const isDocsMode = activeSection === 'docs';
 
-  // Apply theme to document
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('horizon-theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
-  };
+  // true when the Docs view is open — completely separate from the scroll layout
+  const isDocsMode = activeSection === 'docs';
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -46,14 +39,9 @@ function App() {
 
   const handleNavigate = (sectionId) => {
     setActiveSection(sectionId);
-    setIsManualNav(true);
-
-    // Re-enable scroll-spy after scroll animation completes
-    setTimeout(() => setIsManualNav(false), 1000);
 
     if (sectionId === 'docs') {
-      // Docs is a separate view — scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Docs is a separate view — no scroll needed, just swap
       if (isMobile) setSidebarOpen(false);
       return;
     }
@@ -67,9 +55,9 @@ function App() {
     if (isMobile) setSidebarOpen(false);
   };
 
-  // Scroll-spy — only active when NOT in docs mode AND not during manual navigation
+  // Scroll-spy — only active when NOT in docs mode
   useEffect(() => {
-    if (isDocsMode || isManualNav) return;
+    if (isDocsMode) return;
 
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 200;
@@ -87,7 +75,7 @@ function App() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isDocsMode, isManualNav]);
+  }, [isDocsMode]);
 
   const sidebarClass = isMobile ? '' : sidebarCollapsed ? 'with-sidebar-collapsed' : 'with-sidebar';
 
@@ -104,12 +92,7 @@ function App() {
       />
 
       <div className={`main-content ${sidebarClass}`}>
-        <Topbar 
-          onMenuClick={() => setSidebarOpen(o => !o)} 
-          showMenuButton={isMobile}
-          theme={theme}
-          onToggleTheme={toggleTheme}
-        />
+        <Topbar onMenuClick={() => setSidebarOpen(o => !o)} showMenuButton={isMobile} />
 
         <AnimatePresence mode="wait">
           {isDocsMode ? (
