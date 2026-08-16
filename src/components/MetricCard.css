@@ -223,3 +223,41 @@
   .mc-value { font-size: 2rem; }
   .mc-spark-wrap { height: 32px; }
 }
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE OVERRIDES — MetricCard
+═══════════════════════════════════════════ */
+
+[data-theme="light"] .mc-card {
+  background: #FFFFFF;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .mc-card:hover {
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.2),
+    0 0 20px rgba(var(--accent-rgb), 0.1),
+    0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .mc-label {
+  color: #767676;
+}
+
+[data-theme="light"] .mc-value {
+  color: #191919;
+  background: linear-gradient(135deg, #191919 40%, rgba(var(--accent-rgb), 0.85) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .mc-desc {
+  color: #767676;
+}
+
+[data-theme="light"] .mc-trend--neutral {
+  color: #A0A0A0;
+}

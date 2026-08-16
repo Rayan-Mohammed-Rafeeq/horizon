@@ -157,8 +157,8 @@
 
 .logo-ring {
   position: relative;
-  width: 52px;
-  height: 52px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,10 +170,10 @@
 }
 
 .logo-image {
-  width: 38px;
-  height: 38px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(124, 92, 255, 0.5));
+  filter: drop-shadow(0 0 14px rgba(124, 92, 255, 0.55));
   position: relative;
   z-index: 1;
 }
@@ -185,23 +185,6 @@
   filter: drop-shadow(0 0 8px rgba(124, 92, 255, 0.4));
   position: relative;
   z-index: 1;
-}
-
-/* Spinning gradient ring */
-.logo-ring-border {
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  border: 1.5px solid transparent;
-  background: linear-gradient(135deg, #7C5CFF, #06B6D4, #7C5CFF) border-box;
-  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
-  animation: logoSpin 8s linear infinite;
-}
-
-@keyframes logoSpin {
-  to { transform: rotate(360deg); }
 }
 
 .sidebar-brand {
@@ -562,7 +545,7 @@
       transparent 40%,
       rgba(6, 182, 212, 0.02) 100%),
     #FFFFFF;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="light"] .sidebar-noise {
@@ -570,12 +553,13 @@
 }
 
 [data-theme="light"] .nav-item {
-  color: var(--color-text-secondary);
+  color: #595959;
 }
 
 [data-theme="light"] .nav-item:hover {
-  background: rgba(124, 92, 255, 0.06);
-  color: var(--color-text-primary);
+  background: rgba(0, 0, 0, 0.04);
+  color: #191919;
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="light"] .nav-item.active {
@@ -589,24 +573,24 @@
 }
 
 [data-theme="light"] .brand-name {
-  color: #000000;
+  color: #191919;
   font-weight: 900;
 }
 
 [data-theme="light"] .brand-tagline {
-  color: #64748B;
+  color: #767676;
 }
 
 [data-theme="light"] .rpb-label {
-  color: #64748B;
+  color: #767676;
 }
 
 [data-theme="light"] .rpb-value {
-  color: #0F172A;
+  color: #191919;
 }
 
 [data-theme="light"] .rpb-track {
-  background: rgba(0,0,0,0.08);
+  background: rgba(0,0,0,0.1);
 }
 
 [data-theme="light"] .rpb-fill {
@@ -615,18 +599,57 @@
 
 [data-theme="light"] .nav-section-label,
 [data-theme="light"] .nav-divider-label {
-  color: #64748B;
+  color: #767676;
 }
 
 [data-theme="light"] .version-label,
 [data-theme="light"] .version-num {
-  color: #0F172A;
+  color: #191919;
 }
 
 [data-theme="light"] .version-copy {
-  color: #94A3B8;
+  color: #A0A0A0;
 }
 
 [data-theme="light"] .fs-label {
-  color: #64748B;
+  color: #595959;
+}
+
+[data-theme="light"] .nav-shortcut {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .nav-item:hover .nav-shortcut {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .nav-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .nav-item.active {
+  color: var(--color-primary);
+}
+
+[data-theme="light"] .nav-divider {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .sidebar-header {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .sidebar-footer {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .footer-status {
+  background: rgba(5, 150, 105, 0.06);
+  border-color: rgba(5, 150, 105, 0.15);
+}
+
+[data-theme="light"] .risk-pulse-bar {
+  background: rgba(220, 38, 38, 0.05);
+  border-color: rgba(220, 38, 38, 0.18);
 }

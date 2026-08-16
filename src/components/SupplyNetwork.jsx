@@ -354,7 +354,6 @@ const SupplyNetworkInner = () => {
         transition={{ duration: 0.55 }}
       >
         <div className="sn-header-left">
-          <div className="sn-eyebrow">SECTION 02 • LIVE TRACKING</div>
           <h2 className="sn-section-title">
             <span className="grad-text">Supply</span> Network
           </h2>
@@ -412,7 +411,7 @@ const SupplyNetworkInner = () => {
               fitViewOptions={{ padding: 0.12 }}
               nodesDraggable={false}
               nodesConnectable={false}
-              elementsSelectable={false}
+              elementsSelectable={true}
               panOnDrag={false}
               zoomOnScroll={false}
               zoomOnPinch={false}

@@ -103,41 +103,87 @@
   flex-shrink: 0;
 }
 
+.flow-icon svg {
+  flex-shrink: 0;
+  fill: none;
+}
+
 .flow-icon.origin {
-  background: rgba(100, 150, 255, 0.12);
-  border: 1px solid rgba(100, 150, 255, 0.3);
-  color: #6496ff;
+  background: rgba(71, 85, 105, 0.6);
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 0 12px rgba(100, 150, 255, 0.15);
+}
+
+.flow-icon.origin svg {
+  color: #93C5FD !important;
+  stroke: #93C5FD !important;
 }
 
 .flow-icon.chokepoint {
-  background: var(--color-critical-bg);
-  border: 1px solid var(--color-critical-border);
-  color: var(--color-critical);
-  box-shadow: 0 0 10px var(--color-critical-glow);
+  background: rgba(71, 85, 105, 0.6);
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
   animation: chokepointPulse 2s ease-in-out infinite;
 }
 
+.flow-icon.chokepoint svg {
+  color: #EF4444 !important;
+  stroke: #EF4444 !important;
+}
+
 @keyframes chokepointPulse {
-  0%, 100% { box-shadow: 0 0 8px var(--color-critical-glow); }
-  50%       { box-shadow: 0 0 16px var(--color-critical-glow); }
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+  50%       { box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
 }
 
 .flow-icon.destination {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  color: var(--color-success);
+  background: rgba(71, 85, 105, 0.6);
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
+}
+
+.flow-icon.destination svg {
+  color: #34D399 !important;
+  stroke: #34D399 !important;
 }
 
 .flow-label {
   font-size: 0.65rem;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: #FFFFFF;
   text-align: center;
   line-height: 1.2;
   max-width: 64px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
+  cursor: help;
+}
+
+/* Tooltip on hover to show full name */
+.flow-label:hover {
+  overflow: visible;
+  z-index: 10;
+}
+
+.flow-label:hover::after {
+  content: attr(data-full-text);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.95);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
 .flow-label.danger {
@@ -215,4 +261,78 @@
   .route-path        { padding: 8px; }
   .route-metrics     { gap: 6px; }
   .route-metric      { padding: 7px 8px; }
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE OVERRIDES — SupplyRouteCard
+═══════════════════════════════════════════ */
+
+[data-theme="light"] .supply-route-card {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .supply-route-card:hover {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .route-name {
+  color: #191919;
+}
+
+[data-theme="light"] .route-path-flow {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .flow-icon.origin {
+  background: #E8E6E3;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #595959;
+}
+
+[data-theme="light"] .flow-icon.destination {
+  background: #E8E6E3;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #595959;
+}
+
+[data-theme="light"] .flow-icon.chokepoint {
+  background: #E8E6E3;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #595959;
+  box-shadow: none;
+}
+
+[data-theme="light"] .flow-label {
+  color: #191919 !important;
+  font-weight: 600;
+}
+
+[data-theme="light"] .flow-label.danger {
+  color: #DC2626 !important;
+  font-weight: 700;
+}
+
+[data-theme="light"] .route-metric {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .route-metric:hover {
+  background: #EEE9E2;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .metric-label-small {
+  color: #767676;
+}
+
+[data-theme="light"] .metric-value-small {
+  color: #191919;
+}
+
+[data-theme="light"] .route-inventory {
+  border-top-color: rgba(0, 0, 0, 0.1);
 }

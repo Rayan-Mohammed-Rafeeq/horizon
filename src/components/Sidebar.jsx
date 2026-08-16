@@ -63,7 +63,6 @@ const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile, isColla
             <div className="logo-lockup">
               <div className="logo-ring">
                 <img src="/logo.svg" alt="Horizon" className="logo-image" />
-                <div className="logo-ring-border" />
               </div>
               <div className="sidebar-brand">
                 <div className="brand-name">HORIZON</div>
@@ -83,7 +82,6 @@ const Sidebar = ({ activeSection, onNavigate, isOpen, onClose, isMobile, isColla
           <div className="sidebar-header-collapsed">
             <div className="logo-ring small">
               <img src="/logo.svg" alt="Horizon" className="logo-image-small" />
-              <div className="logo-ring-border" />
             </div>
           </div>
         )}

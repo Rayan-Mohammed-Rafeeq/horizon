@@ -15,8 +15,8 @@
 }
 
 [data-theme="light"] .topbar {
-  background: rgba(255, 255, 255, 0.85);
-  border-bottom: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* ── Animated scan line ──────────────────── */
@@ -175,31 +175,180 @@
   flex-shrink: 0;
 }
 
-/* Theme toggle button */
+/* Theme toggle button - Fancy animated version */
 .theme-toggle {
+  position: relative;
+  width: 62px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%);
+  border: 1.5px solid rgba(124, 92, 255, 0.25);
+  border-radius: 100px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 0 rgba(124, 92, 255, 0);
+}
+
+.theme-toggle:hover .theme-toggle-track {
+  border-color: rgba(124, 92, 255, 0.5);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(124, 92, 255, 0.25);
+}
+
+/* Background effects */
+.theme-toggle-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.theme-bg-stars {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+    radial-gradient(circle at 75% 50%, rgba(255, 255, 255, 0.6) 0.5px, transparent 0.5px),
+    radial-gradient(circle at 45% 70%, rgba(255, 255, 255, 0.7) 0.8px, transparent 0.8px),
+    radial-gradient(circle at 85% 25%, rgba(255, 255, 255, 0.5) 0.6px, transparent 0.6px);
+  background-size: 100% 100%;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.theme-bg-clouds {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(124, 92, 255, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Sliding thumb */
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #7C5CFF 0%, #A78BFA 100%);
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+  box-shadow: 
+    0 2px 8px rgba(124, 92, 255, 0.4),
+    0 0 0 0 rgba(124, 92, 255, 0),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-thumb[data-theme="dark"] {
+  transform: translateX(30px);
+  background: linear-gradient(135deg, #FCD34D 0%, #FDE68A 100%);
+  box-shadow: 
+    0 2px 12px rgba(252, 211, 77, 0.6),
+    0 0 16px rgba(252, 211, 77, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.theme-toggle:hover .theme-toggle-thumb {
+  box-shadow: 
+    0 4px 16px rgba(124, 92, 255, 0.6),
+    0 0 24px rgba(124, 92, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle:hover .theme-toggle-thumb[data-theme="dark"] {
+  box-shadow: 
+    0 4px 16px rgba(252, 211, 77, 0.8),
+    0 0 24px rgba(252, 211, 77, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.theme-toggle:active .theme-toggle-thumb {
+  transform: scale(0.92);
+}
+
+.theme-toggle:active .theme-toggle-thumb[data-theme="dark"] {
+  transform: translateX(30px) scale(0.92);
+}
+
+/* Icon wrapper */
+.theme-icon-wrapper {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
 }
 
-.theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: var(--color-text-primary);
-  transform: scale(1.05);
+.theme-icon {
+  color: white;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  animation: iconRotateIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.theme-toggle:active {
-  transform: scale(0.95);
+.sun-icon {
+  animation: iconRotateIn 0.5s cubic-bezier(0.4, 0, 0.2, 1), sunPulse 2s ease-in-out infinite;
+}
+
+.moon-icon {
+  animation: iconRotateIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #1E293B;
+}
+
+@keyframes iconRotateIn {
+  0% {
+    transform: rotate(-180deg) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes sunPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(252, 211, 77, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.9));
+  }
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .theme-toggle-track {
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.95) 0%, rgba(191, 219, 254, 0.9) 100%);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+[data-theme="light"] .theme-toggle:hover .theme-toggle-track {
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.08),
+    0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+[data-theme="light"] .theme-bg-stars {
+  opacity: 0;
+}
+
+[data-theme="light"] .theme-bg-clouds {
+  opacity: 1;
 }
 
 /* Demo pill */
@@ -333,4 +482,57 @@
   .topbar-content { padding: 8px 16px; gap: 10px; }
   .company-pill-meta { display: none; }
   .demo-pill span:last-child { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE OVERRIDES — Topbar
+═══════════════════════════════════════════ */
+
+[data-theme="light"] .company-pill {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .company-pill:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(124, 92, 255, 0.3);
+}
+
+[data-theme="light"] .clock-block {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #595959;
+}
+
+[data-theme="light"] .theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.09);
+  border-color: rgba(0, 0, 0, 0.18);
+  color: #191919;
+}
+
+[data-theme="light"] .health-chip {
+  border-color: transparent;
+}
+
+[data-theme="light"] .chip-green {
+  background: rgba(5, 150, 105, 0.09);
+  border-color: rgba(5, 150, 105, 0.22);
+  color: #059669;
+}
+
+[data-theme="light"] .chip-blue {
+  background: rgba(37, 99, 235, 0.09);
+  border-color: rgba(37, 99, 235, 0.22);
+  color: #2563EB;
+}
+
+[data-theme="light"] .chip-violet {
+  background: rgba(124, 92, 255, 0.09);
+  border-color: rgba(124, 92, 255, 0.22);
+  color: #7C5CFF;
 }

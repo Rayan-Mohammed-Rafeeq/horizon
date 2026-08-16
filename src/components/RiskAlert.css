@@ -422,3 +422,91 @@
     height: 200px;
   }
 }
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE OVERRIDES — RiskAlert
+═══════════════════════════════════════════ */
+
+[data-theme="light"] .risk-alert-grid {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .risk-title {
+  color: #191919;
+}
+
+[data-theme="light"] .confidence-box {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .confidence-label {
+  color: #767676;
+}
+
+[data-theme="light"] .score-max {
+  color: #767676;
+}
+
+[data-theme="light"] .score-label {
+  color: #767676;
+}
+
+[data-theme="light"] .signals-header {
+  color: #767676;
+}
+
+[data-theme="light"] .signal-row {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .signal-label {
+  color: #595959;
+}
+
+[data-theme="light"] .risk-disclaimer {
+  background: rgba(217, 119, 6, 0.06);
+  border-color: rgba(217, 119, 6, 0.2);
+}
+
+[data-theme="light"] .risk-disclaimer p {
+  color: #595959;
+}
+
+[data-theme="light"] .risk-right-section {
+  background: #F5F4F0;
+  border-left-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .recent-activity-sidebar {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .activity-header {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .activity-header span {
+  color: #767676;
+}
+
+[data-theme="light"] .activity-item {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .activity-item:hover {
+  background: #EEE9E2;
+  border-color: rgba(0, 0, 0, 0.13);
+}
+
+[data-theme="light"] .activity-title {
+  color: #191919;
+}
+
+[data-theme="light"] .activity-time {
+  color: #767676;
+}

@@ -79,11 +79,21 @@ const Topbar = ({ onMenuClick, showMenuButton = false, theme, onToggleTheme }) =
             onClick={onToggleTheme}
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            {theme === 'dark' ? (
-              <Sun size={16} strokeWidth={2} />
-            ) : (
-              <Moon size={16} strokeWidth={2} />
-            )}
+            <div className="theme-toggle-track">
+              <div className="theme-toggle-thumb" data-theme={theme}>
+                <div className="theme-icon-wrapper">
+                  {theme === 'dark' ? (
+                    <Sun size={14} strokeWidth={2.5} className="theme-icon sun-icon" />
+                  ) : (
+                    <Moon size={14} strokeWidth={2.5} className="theme-icon moon-icon" />
+                  )}
+                </div>
+              </div>
+              <div className="theme-toggle-bg">
+                <div className="theme-bg-stars" />
+                <div className="theme-bg-clouds" />
+              </div>
+            </div>
           </button>
 
           {/* Demo badge */}

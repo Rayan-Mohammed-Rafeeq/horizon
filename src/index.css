@@ -117,26 +117,28 @@
   --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Light Theme */
+/* Light Theme — LinkedIn-style warm grey */
 [data-theme="light"] {
-  /* Light backgrounds */
-  --color-bg-primary: #F8FAFC;
-  --color-bg-secondary: #F1F5F9;
-  --color-bg-tertiary: #E2E8F0;
+  /* Warm grey page backgrounds (LinkedIn: #F3F2EF) */
+  --color-bg-primary: #F3F2EF;
+  --color-bg-secondary: #E9E5DF;
+  --color-bg-tertiary: #DDD9D3;
   --color-bg-elevated: #FFFFFF;
   
+  /* White card surfaces on warm grey */
   --color-surface: #FFFFFF;
-  --color-surface-elevated: #F8FAFC;
-  --color-surface-hover: #F1F5F9;
+  --color-surface-elevated: #EEF0F2;
+  --color-surface-hover: #E4E2DE;
   
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-strong: rgba(0, 0, 0, 0.12);
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-border-strong: rgba(0, 0, 0, 0.16);
   --color-border-accent: rgba(124, 92, 255, 0.3);
   
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-tertiary: #64748B;
-  --color-text-muted: #94A3B8;
+  /* LinkedIn text hierarchy */
+  --color-text-primary: #191919;
+  --color-text-secondary: #595959;
+  --color-text-tertiary: #767676;
+  --color-text-muted: #A0A0A0;
   
   /* Status Colors - slightly adjusted for light mode */
   --color-critical: #DC2626;
@@ -176,11 +178,11 @@
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(0, 0, 0, 0.08);
   
-  /* Shadows for light mode */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  /* Shadows for light mode — warm tinted */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.07);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.06);
 }
 
 html {

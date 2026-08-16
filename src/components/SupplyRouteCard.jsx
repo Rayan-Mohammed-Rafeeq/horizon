@@ -35,7 +35,7 @@ const SupplyRouteCard = ({ route, delay = 0, onClick }) => {
           <div className="flow-icon origin">
             <MapPin size={12} />
           </div>
-          <div className="flow-label">{route.origin}</div>
+          <div className="flow-label" data-full-text={route.origin}>{route.origin}</div>
         </div>
 
         <div className="flow-connector">
@@ -50,7 +50,7 @@ const SupplyRouteCard = ({ route, delay = 0, onClick }) => {
               <div className="flow-icon chokepoint">
                 <AlertTriangle size={12} />
               </div>
-              <div className="flow-label danger">{route.chokepoint}</div>
+              <div className="flow-label danger" data-full-text={route.chokepoint}>{route.chokepoint}</div>
             </div>
             <div className="flow-connector">
               <div className="flow-line" />
@@ -64,7 +64,7 @@ const SupplyRouteCard = ({ route, delay = 0, onClick }) => {
           <div className="flow-icon destination">
             <Factory size={12} />
           </div>
-          <div className="flow-label">{route.destination}</div>
+          <div className="flow-label" data-full-text={route.destination}>{route.destination}</div>
         </div>
       </div>
 

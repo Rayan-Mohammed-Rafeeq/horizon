@@ -37,13 +37,13 @@
 
 .flow-node {
   padding: 0.75rem 1.5rem;
-  background: var(--gradient-blue);
+  background: linear-gradient(135deg, #7C5CFF 0%, #06B6D4 100%);
   color: white;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 600;
   text-align: center;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 20px rgba(124, 92, 255, 0.3);
 }
 
 .flow-arrow {
@@ -384,7 +384,7 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  background: var(--gradient-blue);
+  background: linear-gradient(135deg, #7C5CFF 0%, #06B6D4 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -457,4 +457,140 @@
   .step-connector {
     transform: rotate(0);
   }
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE OVERRIDES — Impact
+═══════════════════════════════════════════ */
+
+[data-theme="light"] .downstream-impact,
+[data-theme="light"] .emergency-response,
+[data-theme="light"] .system-overview {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .subsection-title {
+  color: #191919;
+}
+
+[data-theme="light"] .subsection-description {
+  color: #767676;
+}
+
+[data-theme="light"] .impact-flow {
+  background: #EEF0F2;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .flow-arrow {
+  color: #A0A0A0;
+}
+
+[data-theme="light"] .customer-card {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .customer-card:hover {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .customer-icon {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #767676;
+}
+
+[data-theme="light"] .customer-name {
+  color: #191919;
+}
+
+[data-theme="light"] .customer-industry {
+  color: #767676;
+}
+
+[data-theme="light"] .priority-label {
+  color: #767676;
+}
+
+[data-theme="light"] .emergency-scenario {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .emergency-metric {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .metric-label-small {
+  color: #767676;
+}
+
+[data-theme="light"] .metric-value-medium {
+  color: #191919;
+}
+
+[data-theme="light"] .metric-value-medium.critical {
+  color: #DC2626;
+}
+
+[data-theme="light"] .actions-title {
+  color: #191919;
+}
+
+[data-theme="light"] .action-item {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #595959;
+}
+
+[data-theme="light"] .plan-item {
+  background: #FFFFFF;
+}
+
+[data-theme="light"] .plan-label {
+  color: #767676;
+}
+
+[data-theme="light"] .plan-value {
+  color: #191919;
+}
+
+[data-theme="light"] .plan-result {
+  background: rgba(5, 150, 105, 0.1);
+}
+
+[data-theme="light"] .preparedness-note {
+  background: #F5F4F0;
+  border-left-color: #2563EB;
+}
+
+[data-theme="light"] .preparedness-note p {
+  color: #595959;
+}
+
+[data-theme="light"] .step-card {
+  background: #F5F4F0;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .step-card:hover {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .step-title {
+  color: #191919;
+}
+
+[data-theme="light"] .step-description {
+  color: #767676;
+}
+
+
+[data-theme="light"] .flow-node {
+  background: linear-gradient(135deg, #7C5CFF 0%, #06B6D4 100%);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(124, 92, 255, 0.25);
 }
