@@ -58,7 +58,23 @@ function App() {
       return;
     }
 
-    // Scroll to the section within the dashboard
+    // If we're currently in docs mode and navigating to a dashboard section,
+    // we need to wait for the dashboard to render before scrolling
+    if (isDocsMode) {
+      // Close mobile sidebar first
+      if (isMobile) setSidebarOpen(false);
+      
+      // Wait for the dashboard to mount, then scroll to the section
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 350); // Match the AnimatePresence transition duration
+      return;
+    }
+
+    // Normal dashboard navigation - scroll to the section
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
